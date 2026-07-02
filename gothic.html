@@ -237,6 +237,10 @@
 
         <div class="comparison" data-comparison>
 
+          <button class="comparison-expand" aria-label="View fullscreen" title="View fullscreen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
+
           <!-- Pair 1 -->
           <div class="cpair  active" data-caption="Entrance area">
             <div class="comparison-before">
@@ -353,6 +357,10 @@
         </div>
 
         <div class="comparison" data-comparison>
+
+          <button class="comparison-expand" aria-label="View fullscreen" title="View fullscreen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
           <div class="cpair  active" data-caption="Temple Entrance">
             <div class="comparison-before">
               <img src="images/SleeperTemple_Blockout_01.jpg" alt="SleeperTemple_Blockout_01">
@@ -464,6 +472,10 @@
         </div>
 
         <div class="comparison" data-comparison>
+
+          <button class="comparison-expand" aria-label="View fullscreen" title="View fullscreen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
           <div class="cpair  active" data-caption="Tundra Forest">
             <div class="comparison-before">
               <img src="images/Tundra_Blockout_01.jpg" alt="Tundra_Blockout_01">
@@ -506,6 +518,15 @@
 
 
   </div><!-- end Level breakdown -->
+
+
+  <!-- COMPARISON LIGHTBOX (shared overlay — the active comparator moves in here on expand) -->
+  <div class="lightbox-overlay" id="lightbox-overlay">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg>
+    </button>
+    <div class="lightbox-content" id="lightbox-content"></div>
+  </div>
 
 
   <!-- PAGE FOOTER -->
@@ -631,6 +652,70 @@
     }
 
     document.querySelectorAll('.comparison-wrap').forEach(initComparison);
+
+
+    /* ── COMPARISON LIGHTBOX — expand a comparator to fullscreen ── */
+    (function () {
+      const overlay  = document.getElementById('lightbox-overlay');
+      const content  = document.getElementById('lightbox-content');
+      const closeBtn = document.getElementById('lightbox-close');
+      if (!overlay || !content || !closeBtn) return;
+
+      let movedEl = null, originalParent = null, originalNext = null;
+
+      function openLightbox(wrap) {
+        if (movedEl === wrap) return;      // already showing this one
+        if (movedEl) closeLightbox();      // always clear out whatever was open first
+
+        movedEl        = wrap;
+        originalParent = wrap.parentNode;
+        originalNext   = wrap.nextSibling;
+        content.appendChild(wrap);
+        overlay.classList.add('open');
+        document.body.classList.add('lightbox-lock');
+      }
+
+      function closeLightbox() {
+        if (!movedEl) return;
+        if (originalNext) originalParent.insertBefore(movedEl, originalNext);
+        else originalParent.appendChild(movedEl);
+        overlay.classList.remove('open');
+        document.body.classList.remove('lightbox-lock');
+        movedEl = null;
+      }
+
+      document.querySelectorAll('.comparison-expand').forEach(btn => {
+        let touchHandled = false;
+
+        function handleExpand(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const wrap = btn.closest('.comparison-wrap');
+          if (wrap) openLightbox(wrap);
+        }
+
+        /* stop the tap from also being read as a drag on the slider underneath */
+        btn.addEventListener('mousedown', e => e.stopPropagation());
+
+        /* mobile: act on touchend directly rather than waiting on a synthetic click,
+           which can get lost or delayed on top of the slider's own touch handling */
+        btn.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+        btn.addEventListener('touchend', e => {
+          touchHandled = true;
+          handleExpand(e);
+          setTimeout(() => { touchHandled = false; }, 500);
+        });
+
+        btn.addEventListener('click', e => {
+          if (touchHandled) return; // ghost click after touchend already handled it
+          handleExpand(e);
+        });
+      });
+
+      closeBtn.addEventListener('click', closeLightbox);
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeLightbox(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+    })();
 
 
     /* ── SCROLL REVEAL ── */

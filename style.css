@@ -1800,6 +1800,49 @@ button {
 
 .cpair-caption { padding: 8px 14px; font-size: 0.5625rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); border-top: 0.5px solid var(--color-line); background: var(--color-bg); min-height: 41px; display: flex; align-items: center; justify-content: center; width: 100%; }
 
+/* ── COMPARISON EXPAND BUTTON ── */
+.comparison-expand {
+  position: absolute; bottom: 12px; right: 12px; z-index: 12;
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  background: rgba(13,13,13,0.65); border: 0.5px solid rgba(232,228,220,0.25);
+  color: rgba(232,228,220,0.85);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; pointer-events: auto; touch-action: manipulation;
+  transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
+}
+.comparison-expand:hover { border-color: var(--color-accent-border); color: var(--color-accent); background: rgba(13,13,13,0.85); }
+
+/* ── COMPARISON LIGHTBOX ── */
+body.lightbox-lock { overflow: hidden; }
+
+.lightbox-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(6,5,3,0.94);
+  display: none; align-items: center; justify-content: center;
+  padding: 56px 20px 20px;
+}
+.lightbox-overlay.open { display: flex; }
+
+.lightbox-content { width: 100%; max-width: 1100px; }
+.lightbox-content .comparison-wrap { border-top: none; }
+.lightbox-content .comparison-wrap .comparison { max-height: 78vh; }
+
+.lightbox-close {
+  position: fixed; top: 16px; right: 16px; z-index: 1000;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(13,13,13,0.75); border: 0.5px solid rgba(232,228,220,0.25);
+  color: rgba(232,228,220,0.9);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--transition-base), color var(--transition-base);
+}
+.lightbox-close:hover { border-color: var(--color-accent-border); color: var(--color-accent); }
+
+@media (max-width: 768px) {
+  .lightbox-overlay { padding: 64px 0 0; }
+  .lightbox-content .comparison-wrap .comparison { max-height: none; aspect-ratio: 16 / 9; }
+}
+
 /* ── LEVEL BREAKDOWN: compare + video side by side ── */
 .card-level-bottom {
   display: grid;
