@@ -2040,12 +2040,17 @@ body.lightbox-lock { overflow: hidden; }
 @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
   .card-level-top {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 2fr;
     align-items: stretch;
   }
   .card-level-image {
     height: auto;
     padding-top: 0;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
     border-right: 0.5px solid var(--color-line);
     border-bottom: none;
   }
