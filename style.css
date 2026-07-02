@@ -2030,3 +2030,20 @@ body.lightbox-lock { overflow: hidden; }
 }
 
 
+
+/* ── DESKTOP ONLY: zone card image sits beside the text again ──
+   Everywhere else (tablet, mobile, iPad in any orientation) stays stacked —
+   that combination is what proved reliable. This only kicks in on screens
+   wide enough to comfortably fit two columns (real desktop browsers). */
+@media (min-width: 1025px) {
+  .card-level-top {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: stretch;
+  }
+  .card-level-image {
+    border-right: 0.5px solid var(--color-line);
+    border-bottom: none;
+    align-self: center;
+  }
+}
