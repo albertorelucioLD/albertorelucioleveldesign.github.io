@@ -2039,19 +2039,22 @@ body.lightbox-lock { overflow: hidden; }
    tell them apart. */
 @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
   .card-level-top {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    align-items: stretch;
+    display: flex;
+    align-items: flex-start;
   }
   .card-level-image {
+    flex: 0 0 38%;
+    max-width: 38%;
     height: auto;
     padding-top: 0;
     aspect-ratio: 16 / 9;
     display: flex;
     align-items: center;
     justify-content: center;
-    align-self: center;
     border-right: 0.5px solid var(--color-line);
     border-bottom: none;
+  }
+  .card-level-body {
+    flex: 0 1 auto;
   }
 }

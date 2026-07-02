@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
 
@@ -715,6 +715,59 @@
       closeBtn.addEventListener('click', closeLightbox);
       overlay.addEventListener('click', e => { if (e.target === overlay) closeLightbox(); });
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+    })();
+
+
+    /* ── ZONE CARD: fit text column width to the image's height (desktop only) ──
+       The image column stays a fixed proportion of the card. This measures its
+       rendered height, then binary-searches the text column's width until the
+       text's natural content height comes as close as possible without
+       exceeding it — so the photo never stretches or crops to match the text,
+       the text adapts to the photo instead. */
+    (function () {
+      const isDesktop = () => window.matchMedia('(min-width: 1025px) and (hover: hover) and (pointer: fine)').matches;
+
+      function fitCard(wrap) {
+        const imageEl = wrap.querySelector('.card-level-image');
+        const bodyEl  = wrap.querySelector('.card-level-body');
+        if (!imageEl || !bodyEl) return;
+
+        if (!isDesktop()) {
+          bodyEl.style.width = '';
+          return;
+        }
+
+        const targetHeight = imageEl.offsetHeight;
+        const cardWidth    = wrap.offsetWidth;
+        const imageWidth   = imageEl.offsetWidth;
+        const maxWidth     = Math.max(280, cardWidth - imageWidth - 4);
+        const minWidth     = 280;
+
+        if (targetHeight <= 0 || maxWidth <= minWidth) { bodyEl.style.width = ''; return; }
+
+        let lo = minWidth, hi = maxWidth, best = maxWidth;
+        for (let i = 0; i < 14; i++) {
+          const mid = Math.round((lo + hi) / 2);
+          bodyEl.style.width = mid + 'px';
+          const h = bodyEl.scrollHeight;
+          if (h <= targetHeight) { best = mid; hi = mid; }
+          else { lo = mid; }
+        }
+        bodyEl.style.width = best + 'px';
+      }
+
+      function fitAll() {
+        document.querySelectorAll('.card-level-top').forEach(fitCard);
+      }
+
+      fitAll();
+      window.addEventListener('load', fitAll);
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(fitAll, 150);
+      });
     })();
 
 
