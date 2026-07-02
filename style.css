@@ -367,9 +367,10 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--section-x);
-  background: rgba(13, 13, 13, 0.92);
+  background: rgba(13, 13, 13, 0.97);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  border-bottom: 0.5px solid var(--color-line);
   border-bottom: 0.5px solid var(--color-line);
 }
 
