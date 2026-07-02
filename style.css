@@ -1837,6 +1837,29 @@ body.lightbox-lock { overflow: hidden; }
   .lightbox-content .comparison-wrap .comparison { max-height: none; aspect-ratio: 16 / 9; }
 }
 
+/* Landscape phones: fit the whole comparator (nav + image + caption) inside the
+   screen height rather than forcing a 16:9 image, which pushed the prev/next
+   nav bar off-screen. The comparator image just fills whatever space is left. */
+@media (max-height: 700px) and (orientation: landscape) {
+  .lightbox-overlay { padding: 12px 16px; align-items: stretch; }
+  .lightbox-content {
+    display: flex; align-items: center; justify-content: center;
+    max-height: 100%; width: 100%;
+  }
+  .lightbox-content .comparison-wrap {
+    display: flex; flex-direction: column;
+    max-height: 100%; width: 100%;
+  }
+  .lightbox-content .comparison-wrap .comparison {
+    aspect-ratio: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .lightbox-content .cpair-caption { flex: 0 0 auto; }
+  .lightbox-content .comparison-nav { flex: 0 0 auto; }
+}
+
 /* ── LEVEL BREAKDOWN: compare + video side by side ── */
 .card-level-bottom {
   display: grid;
