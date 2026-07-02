@@ -432,6 +432,30 @@
 
     })();
 
+    /* ── HAMBURGER MENU ── */
+    (function () {
+      var hamburger = document.getElementById('hamburger');
+      var drawer    = document.getElementById('nav-drawer');
+      if (!hamburger || !drawer) return;
+
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+      window.closeDrawer = closeDrawer;
+
+      hamburger.addEventListener('click', function () {
+        var open = drawer.classList.toggle('open');
+        hamburger.setAttribute('aria-expanded', open);
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!drawer.contains(e.target) && !hamburger.contains(e.target)) {
+          closeDrawer();
+        }
+      });
+    })();
+
     /* ── CORNER BRACKETS ANIMATION — mobile only ── */
     (function () {
       var corners = ['hc-tl', 'hc-tr', 'hc-br', 'hc-bl'];
