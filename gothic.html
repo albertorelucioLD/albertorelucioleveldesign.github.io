@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=14">
+  <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
 
@@ -719,18 +719,34 @@
 
 
     /* ── ZONE CARD: fit text column width to the image's height (desktop only) ──
-       The image column stays a fixed proportion of the card. This measures its
-       rendered height, then binary-searches the text column's width until the
-       text's natural content height comes as close as possible without
-       exceeding it — so the photo never stretches or crops to match the text,
-       the text adapts to the photo instead. */
+       The image column stays a fixed proportion of the card — it never
+       stretches or crops to match the text. This measures the image's
+       rendered height, then binary-searches the text column's width until
+       the text's content height fits within it. If even the widest allowed
+       column still overflows (zones with a lot of copy), it falls back to
+       tighter spacing (.compact) and searches again — the photo's size is
+       never touched either way. */
     (function () {
       const isDesktop = () => window.matchMedia('(min-width: 1025px) and (hover: hover) and (pointer: fine)').matches;
+
+      function searchWidth(bodyEl, minWidth, maxWidth, targetHeight) {
+        let lo = minWidth, hi = maxWidth, best = null;
+        for (let i = 0; i < 16; i++) {
+          const mid = Math.round((lo + hi) / 2);
+          bodyEl.style.width = mid + 'px';
+          const h = bodyEl.scrollHeight;
+          if (h <= targetHeight) { best = mid; hi = mid; }
+          else { lo = mid; }
+        }
+        return best; // null means nothing in range satisfied the target height
+      }
 
       function fitCard(wrap) {
         const imageEl = wrap.querySelector('.card-level-image');
         const bodyEl  = wrap.querySelector('.card-level-body');
         if (!imageEl || !bodyEl) return;
+
+        bodyEl.classList.remove('compact');
 
         if (!isDesktop()) {
           bodyEl.style.width = '';
@@ -745,15 +761,19 @@
 
         if (targetHeight <= 0 || maxWidth <= minWidth) { bodyEl.style.width = ''; return; }
 
-        let lo = minWidth, hi = maxWidth, best = maxWidth;
-        for (let i = 0; i < 14; i++) {
-          const mid = Math.round((lo + hi) / 2);
-          bodyEl.style.width = mid + 'px';
-          const h = bodyEl.scrollHeight;
-          if (h <= targetHeight) { best = mid; hi = mid; }
-          else { lo = mid; }
+        let best = searchWidth(bodyEl, minWidth, maxWidth, targetHeight);
+
+        if (best === null) {
+          /* Doesn't fit at any width — tighten spacing and try again rather
+             than letting the text spill past the photo's height. */
+          bodyEl.classList.add('compact');
+          best = searchWidth(bodyEl, minWidth, maxWidth, targetHeight);
         }
-        bodyEl.style.width = best + 'px';
+
+        /* Still doesn't fit even compact: use the widest allowed column so
+           at least the overflow is as small as possible, rather than a
+           narrow, badly-wrapped block of text. */
+        bodyEl.style.width = (best !== null ? best : maxWidth) + 'px';
       }
 
       function fitAll() {

@@ -1146,6 +1146,14 @@ button {
   max-width: min(100%, 720px);
 }
 
+/* Fallback for zones with a lot of text: applied by JS only when even the
+   widest allowed column still overflows the image's height. Tightens
+   spacing so more content fits without shrinking the image at all. */
+.card-level-body.compact { gap: 8px; padding-top: 22px; padding-bottom: 22px; }
+.card-level-body.compact .t-body { line-height: 1.55; }
+.card-level-body.compact ul { gap: 3px !important; }
+.card-level-body.compact li { line-height: 1.45; }
+
 .card-level-body::before,
 .card-level-body::after {
   content: '';
