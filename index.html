@@ -459,7 +459,7 @@
     /* ── CORNER BRACKETS ANIMATION — mobile only ── */
     (function () {
       var corners = ['hc-tl', 'hc-tr', 'hc-br', 'hc-bl'];
-      var isMobile = window.innerWidth <= 768;
+      var isMobile = window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (!isMobile) return;
 
       corners.forEach(function(id, i) {
