@@ -1101,7 +1101,7 @@ button {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
 }
 
@@ -2040,7 +2040,7 @@ body.lightbox-lock { overflow: hidden; }
 @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
   .card-level-top {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1fr;
     align-items: stretch;
   }
   .card-level-image {
