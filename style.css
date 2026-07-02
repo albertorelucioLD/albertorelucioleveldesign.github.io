@@ -1003,10 +1003,8 @@ button {
   position: relative;
   overflow: hidden;
   aspect-ratio: 16 / 9;
+  display: block;
   align-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .card-image img {
@@ -1042,10 +1040,8 @@ button {
   background: #0f0e0c;
   aspect-ratio: 16 / 9;
   position: relative;
+  display: block;
   align-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-right: 0.5px solid var(--color-line);
   overflow: hidden;
 }
@@ -1092,10 +1088,8 @@ button {
   aspect-ratio: 16 / 9;
   position: relative;
   overflow: hidden;
+  display: block;
   align-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-right: 0.5px solid var(--color-line);
 }
 
