@@ -1114,21 +1114,21 @@ button {
   position: absolute;
   width: 16px;
   height: 16px;
-  border-color: rgba(200,169,110,0.55);
+  border-color: rgba(200,169,110,0.85);
   border-style: solid;
   z-index: 2;
 }
-.card-level-image::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
-.card-level-image::after  { top: 10px; right: 10px; border-width: 1px 1px 0 0; }
+.card-level-image::before { top: 10px; left: 10px; border-width: 1.5px 0 0 1.5px; }
+.card-level-image::after  { top: 10px; right: 10px; border-width: 1.5px 1.5px 0 0; }
 
-.card-level-image .img-corner-bl { bottom: 10px; left: 10px;  border-width: 0 0 1px 1px; }
-.card-level-image .img-corner-br { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+.card-level-image .img-corner-bl { bottom: 10px; left: 10px;  border-width: 0 0 1.5px 1.5px; }
+.card-level-image .img-corner-br { bottom: 10px; right: 10px; border-width: 0 1.5px 1.5px 0; }
 .card-level-image .img-corner-bl,
 .card-level-image .img-corner-br {
   position: absolute;
   width: 16px;
   height: 16px;
-  border-color: rgba(200,169,110,0.55);
+  border-color: rgba(200,169,110,0.85);
   border-style: solid;
   z-index: 2;
   pointer-events: none;
@@ -1160,11 +1160,11 @@ button {
   position: absolute;
   width: 16px;
   height: 16px;
-  border-color: rgba(200,169,110,0.55);
+  border-color: rgba(200,169,110,0.85);
   border-style: solid;
 }
-.card-level-body::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
-.card-level-body::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+.card-level-body::before { top: 10px; left: 10px; border-width: 1.5px 0 0 1.5px; }
+.card-level-body::after  { bottom: 10px; right: 10px; border-width: 0 1.5px 1.5px 0; }
 
 .card-level-corners {
   position: absolute;
@@ -1177,11 +1177,11 @@ button {
   position: absolute;
   width: 16px;
   height: 16px;
-  border-color: rgba(200,169,110,0.55);
+  border-color: rgba(200,169,110,0.85);
   border-style: solid;
 }
-.card-level-corners::before { top: 10px; right: 10px; border-width: 1px 1px 0 0; }
-.card-level-corners::after  { bottom: 10px; left: 10px; border-width: 0 0 1px 1px; }
+.card-level-corners::before { top: 10px; right: 10px; border-width: 1.5px 1.5px 0 0; }
+.card-level-corners::after  { bottom: 10px; left: 10px; border-width: 0 0 1.5px 1.5px; }
 
 
 
