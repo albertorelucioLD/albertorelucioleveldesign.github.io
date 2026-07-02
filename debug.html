@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viewport debug</title>
+<style>
+  body { background:#0d0d0d; color:#e8e4dc; font-family: -apple-system, sans-serif; padding:24px; font-size:18px; line-height:1.8; }
+  b { color:#c8a96e; }
+  #mq { margin-top:24px; padding-top:24px; border-top:1px solid #333; }
+  .yes { color:#7fdc7f; }
+  .no  { color:#dc7f7f; }
+</style>
+</head>
+<body>
+  <div id="out">Loading…</div>
+  <div id="mq"></div>
+
+  <script>
+    function render() {
+      var out = document.getElementById('out');
+      out.innerHTML =
+        '<b>window.innerWidth:</b> ' + window.innerWidth + 'px<br>' +
+        '<b>window.innerHeight:</b> ' + window.innerHeight + 'px<br>' +
+        '<b>screen.width:</b> ' + screen.width + 'px<br>' +
+        '<b>screen.height:</b> ' + screen.height + 'px<br>' +
+        '<b>devicePixelRatio:</b> ' + window.devicePixelRatio + '<br>' +
+        '<b>orientation:</b> ' + (screen.orientation ? screen.orientation.type : 'n/a');
+
+      var queries = [
+        ['max-width: 768px',  '(max-width: 768px)'],
+        ['max-width: 900px',  '(max-width: 900px)'],
+        ['max-width: 1024px', '(max-width: 1024px)'],
+        ['max-height: 700px', '(max-height: 700px)'],
+        ['orientation: landscape', '(orientation: landscape)'],
+        ['768 OR landscape-short (mobile block)', '(max-width: 768px), (max-height: 700px) and (orientation: landscape)']
+      ];
+      var mq = document.getElementById('mq');
+      mq.innerHTML = '<b>Media query results:</b><br>' + queries.map(function(q) {
+        var matches = window.matchMedia(q[1]).matches;
+        return q[0] + ': <span class="' + (matches ? 'yes' : 'no') + '">' + (matches ? 'MATCHES' : 'no match') + '</span>';
+      }).join('<br>');
+    }
+    render();
+    window.addEventListener('resize', render);
+    window.addEventListener('orientationchange', function(){ setTimeout(render, 200); });
+  </script>
+</body>
+</html>
