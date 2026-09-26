@@ -7,10 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=17">
-<!-- Cloudflare Web Analytics -->
-<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "90b9877d3f914d518e2e52601ebf6f44"}'></script>
-<!-- End Cloudflare Web Analytics -->
+  <link rel="stylesheet" href="style.css?v=18">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -619,7 +616,7 @@
 
       function applyPos(pct) {
         pos = Math.max(0, Math.min(100, pct));
-        getActiveAfter().style.clipPath = `inset(0 ${100 - pos}% 0 0)`;
+        getActiveAfter().style.clipPath = `inset(0 0 0 ${pos}%)`;
         divider.style.left  = pos + '%';
         handle.style.left   = pos + '%';
         handle.style.top    = '50%';

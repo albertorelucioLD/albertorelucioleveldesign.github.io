@@ -1777,7 +1777,7 @@ button {
 .comparison-before, .comparison-after { position: absolute; inset: 0; width: 100%; height: 100%; }
 .comparison-before img, .comparison-after img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .comparison-before .placeholder, .comparison-after .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
-.comparison-after { clip-path: inset(0 50% 0 0); }
+.comparison-after { clip-path: inset(0 0 0 50%); } /* in-game shows right of the divider, blockout left */
 .comparison-divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--color-accent); z-index: 10; pointer-events: none; }
 .comparison-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 36px; height: 36px; border-radius: 50%; background: var(--color-accent); z-index: 11; display: flex; align-items: center; justify-content: center; pointer-events: none; box-shadow: 0 0 0 3px rgba(200,169,110,0.2); }
 .comparison-label { position: absolute; top: 12px; font-size: 0.5625rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-sm); z-index: 10; pointer-events: none; }
@@ -1799,6 +1799,7 @@ button {
   transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
 }
 .comparison-expand:hover { border-color: var(--color-accent-border); color: var(--color-accent); background: rgba(13,13,13,0.85); }
+.lightbox-content .comparison-expand { display: none; } /* already expanded */
 
 /* ── COMPARISON LIGHTBOX ── */
 body.lightbox-lock { overflow: hidden; }
