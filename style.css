@@ -116,6 +116,16 @@ button {
   --color-chip:            rgba(13,13,13,0.85);           /* chips over imagery, control hovers */
   --color-chip-soft:       rgba(13,13,13,0.65);           /* expand button fill */
   --color-control-border:  rgba(232,228,220,0.25);        /* borders of controls over imagery */
+  --color-text-soft:       rgba(232,228,220,0.70);        /* skill tags */
+  --color-text-list:       rgba(232,228,220,0.65);        /* sidebar lists */
+  --color-icon:            rgba(232,228,220,0.85);        /* expand icon */
+  --color-icon-strong:     rgba(232,228,220,0.90);        /* lightbox close icon */
+  --color-hero-fade:       rgba(13,13,13,0.25);           /* hero gradient midpoint */
+  --color-header-fade:     rgba(10,8,4,0.98);             /* case-study header fade */
+  --color-accent-halo:     rgba(200,169,110,0.12);        /* current timeline dot */
+  --color-accent-ring:     rgba(200,169,110,0.20);        /* comparison handle */
+  --color-lightbox-bg:     rgba(6,5,3,0.94);              /* lightbox backdrop */
+  --color-close-bg:        rgba(13,13,13,0.75);           /* lightbox close button */
 
   /* Typography */
   --font-head: 'Barlow Condensed', sans-serif;
@@ -177,6 +187,7 @@ button {
      half strength); true half-pixel only where the screen can draw it. */
   --hairline: 1px;
   --hairline-drawn: 1px; /* width actually painted for --hairline (borders snap to device pixels) */
+  --tap-round: calc(1px / 32); /* covers the 1/64px rounding of each padding calc() in 44px hit areas */
 }
 
 @media (min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 2) {
@@ -626,7 +637,7 @@ button:focus-visible {
   display: inline-block;
   font-size: var(--text-xs);
   letter-spacing: 0.03em;
-  color: rgba(232, 228, 220, 0.70);
+  color: var(--color-text-soft);
   border: var(--hairline) solid var(--color-line);
   padding: 5px 12px;
   border-radius: var(--radius-sm);
@@ -742,7 +753,7 @@ button:focus-visible {
   background: linear-gradient(
     to top,
     var(--color-nav-bg) 0%,
-    rgba(13,13,13,0.25) 60%,
+    var(--color-hero-fade) 60%,
     transparent 100%
   );
 }
@@ -930,7 +941,7 @@ button:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(to right, rgba(10,8,4,0.98) 40%, transparent 100%);
+  background: linear-gradient(to right, var(--color-header-fade) 40%, transparent 100%);
 }
 
 .page-header-content {
@@ -1263,7 +1274,7 @@ button:focus-visible {
 
 .sidebar-list li {
   font-size: 0.75rem;
-  color: rgba(232, 228, 220, 0.65);
+  color: var(--color-text-list);
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
@@ -1324,7 +1335,7 @@ button:focus-visible {
 
 .timeline-dot--current {
   background: var(--color-accent);
-  box-shadow: 0 0 0 4px rgba(200, 169, 110, 0.12);
+  box-shadow: 0 0 0 4px var(--color-accent-halo);
 }
 
 .timeline-connector {
@@ -1600,9 +1611,9 @@ button:focus-visible {
 
 .comparison-after { clip-path: inset(0 0 0 50%); } /* in-game shows right of the divider, blockout left */
 .comparison-divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--color-accent); z-index: 10; pointer-events: none; }
-.comparison-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 36px; height: 36px; border-radius: 50%; background: var(--color-accent); z-index: 11; display: flex; align-items: center; justify-content: center; pointer-events: none; box-shadow: 0 0 0 3px rgba(200,169,110,0.2); }
+.comparison-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 36px; height: 36px; border-radius: 50%; background: var(--color-accent); z-index: 11; display: flex; align-items: center; justify-content: center; pointer-events: none; box-shadow: 0 0 0 3px var(--color-accent-ring); }
 .comparison-label { position: absolute; top: 12px; font-size: var(--text-label); letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-sm); z-index: 10; pointer-events: none; }
-.comparison-label-before { left: 12px; color: rgba(232,228,220,0.6); background: var(--color-chip); }
+.comparison-label-before { left: 12px; color: var(--color-text-muted); background: var(--color-chip); }
 .comparison-label-after  { right: 12px; color: var(--color-accent-frame); background: var(--color-chip); }
 .comparison-hint { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: var(--text-label); letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); background: var(--color-chip); padding: 4px 10px; border-radius: var(--radius-sm); white-space: nowrap; z-index: 10; pointer-events: none; transition: opacity 0.4s ease; }
 .comparison-hint.hidden { opacity: 0; }
@@ -1614,7 +1625,7 @@ button:focus-visible {
   position: absolute; bottom: 12px; right: 12px; z-index: 12;
   width: 30px; height: 30px; border-radius: var(--radius-sm);
   background: var(--color-chip-soft); border: var(--hairline) solid var(--color-control-border);
-  color: rgba(232,228,220,0.85);
+  color: var(--color-icon);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; pointer-events: auto; touch-action: manipulation;
   transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
@@ -1627,7 +1638,7 @@ body.lightbox-lock { overflow: hidden; }
 
 .lightbox-overlay {
   position: fixed; inset: 0; z-index: 999;
-  background: rgba(6,5,3,0.94);
+  background: var(--color-lightbox-bg);
   display: none; align-items: center; justify-content: center;
   padding: 56px 20px 20px;
 }
@@ -1640,8 +1651,8 @@ body.lightbox-lock { overflow: hidden; }
 .lightbox-close {
   position: fixed; top: 16px; right: 16px; z-index: 1000;
   width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(13,13,13,0.75); border: var(--hairline) solid var(--color-control-border);
-  color: rgba(232,228,220,0.9);
+  background: var(--color-close-bg); border: var(--hairline) solid var(--color-control-border);
+  color: var(--color-icon-strong);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   transition: border-color var(--transition-base), color var(--transition-base);
@@ -1692,9 +1703,9 @@ body.lightbox-lock { overflow: hidden; }
   /* Equal padding and negative margin: the content box (and the icon inside it)
      keeps exactly the position it had; only the hit area grows to 44px. */
   .nav-back {
-    padding-top: calc((44px - 1.65em) / 2);
+    padding-top: calc((44px - 1.65em) / 2 + var(--tap-round));
     padding-bottom: calc((44px - 1.65em) / 2);
-    margin-top: calc((1.65em - 44px) / 2);
+    margin-top: calc((1.65em - 44px) / 2 - var(--tap-round));
     margin-bottom: calc((1.65em - 44px) / 2);
   }
   /* Inline link: vertical padding widens the tap area without touching the line */
@@ -1704,9 +1715,9 @@ body.lightbox-lock { overflow: hidden; }
   }
 
   .nav-logo {
-    padding-top: calc((44px - 1.65em) / 2);
+    padding-top: calc((44px - 1.65em) / 2 + var(--tap-round));
     padding-bottom: calc((44px - 1.65em) / 2);
-    margin-top: calc((1.65em - 44px) / 2);
+    margin-top: calc((1.65em - 44px) / 2 - var(--tap-round));
     margin-bottom: calc((1.65em - 44px) / 2);
   }
 
@@ -1718,17 +1729,17 @@ body.lightbox-lock { overflow: hidden; }
   }
 
   .nav-drawer a {
-    padding-top: calc((44px - 1.65em) / 2);
+    padding-top: calc((44px - 1.65em) / 2 + var(--tap-round));
     padding-bottom: calc((44px - 1.65em) / 2);
-    margin-top: calc((1.65em - 44px) / 2);
+    margin-top: calc((1.65em - 44px) / 2 - var(--tap-round));
     margin-bottom: calc((1.65em - 44px) / 2);
   }
 
   /* Underlined links: grow upwards only, so the underline (border-bottom) and the
      text stay exactly where they were. */
   .link-inline {
-    padding-top: calc(44px - 1.65em - 2px - var(--hairline-drawn));
-    margin-top: calc(1.65em + 2px + var(--hairline-drawn) - 44px);
+    padding-top: calc(44px - 1.65em - 2px - var(--hairline-drawn) + var(--tap-round));
+    margin-top: calc(1.65em + 2px + var(--hairline-drawn) - 44px - var(--tap-round));
   }
 
   /* Framed buttons: the element grows to 44px with no top/bottom border and
@@ -1743,14 +1754,14 @@ body.lightbox-lock { overflow: hidden; }
     border-left-color: transparent;
     border-right-color: transparent;
     background: transparent;
-    padding-top: calc((44px - 1.65em) / 2);
+    padding-top: calc((44px - 1.65em) / 2 + var(--tap-round));
     padding-bottom: calc((44px - 1.65em) / 2);
   }
   .btn        { --frame-h: calc(1.65em + 20px + 2 * var(--hairline-drawn)); }
   .link-ghost { --frame-h: calc(1.65em + 24px + 2 * var(--hairline-drawn)); }
   .btn,
   .link-ghost {
-    margin-top: calc((var(--frame-h) - 44px) / 2);
+    margin-top: calc((var(--frame-h) - 44px) / 2 - var(--tap-round));
     margin-bottom: calc((var(--frame-h) - 44px) / 2);
   }
   .btn::before,
@@ -1758,7 +1769,7 @@ body.lightbox-lock { overflow: hidden; }
     content: '';
     position: absolute;
     z-index: -1;
-    top: calc((44px - var(--frame-h)) / 2);
+    top: calc((44px - var(--frame-h)) / 2 + var(--tap-round));
     bottom: calc((44px - var(--frame-h)) / 2);
     left: calc(-1 * var(--hairline-drawn));
     right: calc(-1 * var(--hairline-drawn));
@@ -1825,7 +1836,7 @@ body.lightbox-lock { overflow: hidden; }
     content: '';
     position: absolute;
     inset: 2px;
-    background: rgba(13,13,13,0.75);
+    background: var(--color-close-bg);
     border: var(--hairline) solid var(--color-control-border);
     border-radius: 50%;
     transition: border-color var(--transition-base);
