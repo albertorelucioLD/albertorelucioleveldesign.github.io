@@ -740,7 +740,7 @@ button {
   max-width: 320px;
 }
 
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .hero-diamond-wrap {
     display: none;
   }
@@ -1005,7 +1005,7 @@ button {
   width: 100%;
   height: 0;
   padding-top: 56.25%; /* 16:9 */
-  align-self: center;
+  align-self: start; /* top-aligned with the text; any leftover space sits below */
 }
 
 .card-image img {
@@ -1589,6 +1589,8 @@ button {
 .reveal {
   animation: revealFallback 0s 2s forwards;
 }
+/* Pages whose scroll observer is running don't need the fallback */
+.js-reveal .reveal { animation: none; }
 
 
 /* ============================================================
@@ -1612,8 +1614,19 @@ button {
   .process-step:nth-child(4) { border-top: 0.5px solid var(--color-line); border-right: none; }
 }
 
+/* Featured card: image beside text only on a wide screen with a mouse/trackpad
+   (same gate as the zone cards); tablets, touch screens and narrow windows stack
+   it, so the 16:9 image never floats in empty space next to taller text. */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .card-featured { display: block; }
+  .card-body {
+    border-left: none;
+    border-top: 0.5px solid var(--color-line);
+  }
+}
+
 /* Mobile — 768px */
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   :root {
     --section-y: 56px;
     --section-x: 20px;
@@ -1827,7 +1840,7 @@ body.lightbox-lock { overflow: hidden; }
 }
 .lightbox-close:hover { border-color: var(--color-accent-border); color: var(--color-accent); }
 
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .lightbox-overlay { padding: 64px 0 0; }
   .lightbox-content .comparison-wrap .comparison { max-height: none; aspect-ratio: 16 / 9; }
 }
@@ -1835,7 +1848,7 @@ body.lightbox-lock { overflow: hidden; }
 /* Landscape phones: fit the whole comparator (nav + image + caption) inside the
    screen height rather than forcing a 16:9 image, which pushed the prev/next
    nav bar off-screen. The comparator image just fills whatever space is left. */
-@media (max-height: 700px) and (orientation: landscape) {
+@media (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .lightbox-overlay {
     padding: 12px 16px;
     align-items: flex-start;
@@ -1877,7 +1890,7 @@ body.lightbox-lock { overflow: hidden; }
 .card-level-video-caption { padding: 8px 14px; font-size: 0.5625rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); border-top: 0.5px solid var(--color-line); background: var(--color-bg); min-height: 41px; display: flex; align-items: center; }
 
 /* ── GOTHIC RESPONSIVE ── */
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .card-level-bottom {
     grid-template-columns: 1fr;
   }
@@ -1914,7 +1927,7 @@ body.lightbox-lock { overflow: hidden; }
 }
 
 /* ── GOTHIC OVERVIEW BLOCKS — mobile stack ── */
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .overview-blocks {
     flex-direction: column !important;
     gap: var(--space-3) !important;
@@ -1942,7 +1955,7 @@ body.lightbox-lock { overflow: hidden; }
   display: none; /* hidden on desktop */
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) { /* same cut as the diamond, so only one decoration shows */
   .hero-corners {
     display: block;
     position: absolute;
@@ -1963,7 +1976,7 @@ body.lightbox-lock { overflow: hidden; }
 
 
 
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .slideshow { max-width: 100%; }
 }
 
@@ -2005,7 +2018,7 @@ body.lightbox-lock { overflow: hidden; }
   display: block;
 }
 
-@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) {
+@media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .trailer-wrap {
     max-width: 100%;
     border-radius: 0;

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=19">
+  <link rel="stylesheet" href="style.css?v=20">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -497,6 +497,16 @@
         }, 500 + i * 120);
       });
     })();
+  </script>
+
+  <script>
+    /* ── SCROLL REVEAL ── (same observer as gothic.html) */
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.08 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.documentElement.classList.add('js-reveal'); // observer is live: drop the 2 s CSS fallback
   </script>
 
 </body>
