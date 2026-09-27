@@ -2305,3 +2305,17 @@ body.lightbox-lock { overflow: hidden; }
   .cpair-caption.as-list { gap: 0 22px; padding-top: 0; padding-bottom: 0; }
   .cpair-name { min-height: 44px; padding: 0; }
 }
+
+/* ── HERO ON PHONES (portrait) ──
+   The hero is one nav-height shorter, and that height comes back as top
+   padding: the identity and its corners stay exactly where they were, now
+   centred between the nav and the stats, and the space under the buttons
+   shrinks so the first two stats show without scrolling. */
+@media (max-width: 768px) and (orientation: portrait) {
+  .hero {
+    height: calc(100vh - 132px - var(--nav-height));
+    height: calc(100svh - 132px - var(--nav-height));
+    min-height: calc(460px - var(--nav-height));
+    padding-top: var(--nav-height);
+  }
+}
