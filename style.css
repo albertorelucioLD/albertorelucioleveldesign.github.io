@@ -661,6 +661,7 @@ button {
 /* Hero */
 .hero {
   height: calc(100vh - 52px - 80px); /* 100vh minus nav and stat bar */
+  height: calc(100svh - 52px - 80px); /* small viewport: iOS toolbars no longer push the stat bar below the fold */
   min-height: 460px;
   display: flex;
   flex-direction: column;
@@ -1856,8 +1857,8 @@ body.lightbox-lock { overflow: hidden; }
 }
 
 /* Landscape phones: fit the whole comparator (nav + image + caption) inside the
-   screen height rather than forcing a 16:9 image, which pushed the prev/next
-   nav bar off-screen. The comparator image just fills whatever space is left. */
+   screen height. The 16:9 frame keeps its ratio; its width is capped to what the
+   height allows, which also keeps it clear of the fixed close button. */
 @media (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .lightbox-overlay {
     padding: 12px 16px;
@@ -1868,11 +1869,82 @@ body.lightbox-lock { overflow: hidden; }
   .lightbox-content {
     width: 100%;
     margin: auto 0; /* centres it when it fits, scrolls into view when it doesn't */
+    /* nav row 44px + caption 41px + overlay padding 24px ≈ 110px of non-image height */
+    max-width: calc((100vh - 110px) * 16 / 9);
+    max-width: calc((100dvh - 110px) * 16 / 9);
   }
   .lightbox-content .comparison-wrap .comparison {
     aspect-ratio: 16 / 9;
     max-height: none;
   }
+}
+
+/* ── TOUCH TARGETS — 44px hit areas on touch screens, same visible size ──
+   Controls grow to 44×44 for the finger; negative margins hand the extra
+   space back so nothing moves, and boxed controls draw their visible square
+   on ::before at the original size. */
+@media (pointer: coarse) {
+  .nav-hamburger {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    align-items: center;
+    margin-right: -3px; /* bars stay where the 38px button drew them */
+  }
+
+  /* Equal padding and negative margin: the content box (and the icon inside it)
+     keeps exactly the position it had; only the hit area grows to 44px. */
+  .nav-back {
+    padding-top: calc((44px - 1.65em) / 2);
+    padding-bottom: calc((44px - 1.65em) / 2);
+    margin-top: calc((1.65em - 44px) / 2);
+    margin-bottom: calc((1.65em - 44px) / 2);
+  }
+  /* Inline link: vertical padding widens the tap area without touching the line */
+  .breadcrumb a {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .cpair-btn {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    margin: -8px;
+    border: 0; /* the visible square is ::before; a leftover border would offset it */
+  }
+  .cpair-btn::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: var(--hairline) solid var(--color-line);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition-base);
+  }
+  .cpair-btn:hover:not(:disabled)::before { border-color: var(--color-accent-border); }
+
+  .comparison-expand {
+    width: 44px;
+    height: 44px;
+    bottom: 5px;
+    right: 5px;
+    background: transparent;
+    border: 0;
+  }
+  .comparison-expand::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    background: rgba(13,13,13,0.65);
+    border: var(--hairline) solid rgba(232,228,220,0.25);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition-base), background var(--transition-base);
+  }
+  .comparison-expand:hover { background: transparent; }
+  .comparison-expand:hover::before { border-color: var(--color-accent-border); background: rgba(13,13,13,0.85); }
+
+  .cpair-btn svg,
+  .comparison-expand svg { position: relative; } /* icon above its ::before square */
 }
 
 /* ── LEVEL BREAKDOWN: compare + video side by side ── */
