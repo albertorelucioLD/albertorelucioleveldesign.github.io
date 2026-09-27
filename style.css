@@ -1688,14 +1688,23 @@ body.lightbox-lock { overflow: hidden; }
   .lightbox-content {
     width: 100%;
     margin: auto 0; /* centres it when it fits, scrolls into view when it doesn't */
-    /* nav row 44px + caption 41px + overlay padding 24px ≈ 110px of non-image height */
-    max-width: calc((100vh - 110px) * 16 / 9);
-    max-width: calc((100dvh - 110px) * 16 / 9);
+    /* nav row 44px + caption 44px + overlay padding 24px = 112px of non-image height */
+    max-width: calc((100vh - 112px) * 16 / 9);
+    max-width: calc((100dvh - 112px) * 16 / 9);
   }
   .lightbox-content .comparison-wrap .comparison {
     aspect-ratio: 16 / 9;
     max-height: none;
   }
+  /* pair names on one scrolling row, so the caption stays one line tall */
+  .lightbox-content .cpair-caption.as-list {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .lightbox-content .cpair-caption.as-list::-webkit-scrollbar { display: none; }
+  .lightbox-content .cpair-name { flex: none; }
 }
 
 /* ── TOUCH TARGETS — 44px hit areas on touch screens, same visible size ──
@@ -2206,4 +2215,93 @@ body.lightbox-lock { overflow: hidden; }
   .overview-blocks .sidebar-block { margin-bottom: 0; }
   .overview-blocks .sidebar-block-content { padding: var(--space-3); }
   .overview-blocks .sidebar-list { gap: 6px; }
+}
+
+/* ── CHAPTER BAR (gothic.html) ──
+   A second row under the nav, pinned while reading. On short windows and
+   touch screens it slides up behind the nav while scrolling down and comes
+   back on the way up (gothic.html decides when). */
+.chap-bar {
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 150;
+  background: var(--color-nav-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: var(--hairline) solid var(--color-line);
+  transition: transform var(--transition-base);
+}
+.chap-bar.is-hidden { transform: translateY(-100%); }
+.chap-bar ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 44px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+.chap-bar ol::-webkit-scrollbar { display: none; }
+.chap-bar li { display: flex; flex: none; }
+.chap-bar a {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition-base), border-color var(--transition-base);
+}
+.chap-bar a:hover,
+.chap-bar a[aria-current] { color: var(--color-accent); }
+.chap-bar a[aria-current] { border-bottom-color: var(--color-accent); }
+.chap-bar a:focus-visible { outline-offset: -4px; }
+.chap-num { color: var(--color-accent-frame); margin-right: var(--space-2); }
+.chap-sep { width: var(--hairline); height: 14px; background: var(--color-line-strong); }
+
+/* Jumps from the bar land below the nav and the bar */
+#overview, #trailer, #process, .card-level { scroll-margin-top: calc(var(--nav-height) + 44px + var(--space-4)); }
+/* A zone card that has not revealed yet sits 16px lower (translateY); the jump is
+   computed on that position, so add the offset back and it lands in the same place. */
+.card-level.reveal:not(.visible) { scroll-margin-top: calc(var(--nav-height) + 44px + var(--space-4) + 16px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .chap-bar { transition: none; }
+}
+
+/* ── PAIR NAMES (N1-9): the caption bar lists every pair ── */
+.cpair-caption.as-list { flex-wrap: wrap; gap: 4px 22px; }
+.cpair-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition-base);
+}
+.cpair-name::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border: var(--hairline) solid var(--color-line-strong);
+  transform: rotate(45deg);
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+.cpair-name:hover { color: var(--color-text); }
+.cpair-name[aria-current="true"] { color: var(--color-text); }
+.cpair-name[aria-current="true"]::before { background: var(--color-accent); border-color: var(--color-accent); }
+@media (pointer: coarse) {
+  .cpair-caption.as-list { gap: 0 22px; padding-top: 0; padding-bottom: 0; }
+  .cpair-name { min-height: 44px; padding: 0; }
 }

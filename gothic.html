@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32">
+  <link rel="stylesheet" href="style.css?v=33">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -51,8 +51,22 @@
   </div>
 
 
+  <!-- CHAPTERS: sticky index; hides while scrolling down, returns when scrolling up -->
+  <nav class="chap-bar" aria-label="Chapters">
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#trailer">Trailer</a></li>
+      <li><a href="#process">Design process</a></li>
+      <li class="chap-sep" aria-hidden="true"></li>
+      <li><a href="#zone-01"><span class="chap-num">01</span>The Old Camp</a></li>
+      <li><a href="#zone-02"><span class="chap-num">02</span>The Sleeper's Temple</a></li>
+      <li><a href="#zone-03"><span class="chap-num">03</span>Open World &amp; Transition Areas</a></li>
+    </ol>
+  </nav>
+
+
   <!-- OVERVIEW -->
-  <div class="section section--bordered">
+  <div class="section section--bordered" id="overview">
     <h2 class="eyebrow">Overview</h2>
     <!-- Single row: text left, three blocks right, always side by side -->
     <div class="overview-blocks">
@@ -112,7 +126,7 @@
 
 
   <!-- TRAILER -->
-  <section class="section section--bordered">
+  <section class="section section--bordered" id="trailer">
     <h2 class="eyebrow mb-6">Trailer</h2>
     <div class="trailer-wrap">
       <iframe
@@ -126,7 +140,7 @@
   </section>
 
     <!-- DESIGN PROCESS -->
-  <div class="section section--bordered">
+  <div class="section section--bordered" id="process">
     <h2 class="eyebrow">Design process</h2>
     <div class="process-grid">
       <div class="process-step">
@@ -178,7 +192,7 @@
     <p class="t-body mb-10 breakdown-intro">A selection of zones from across the Valley of Mines, chosen to show range across typologies — open world, interior, hub and dungeon. I worked on over 18 zones throughout the project; these highlight key design decisions and the blockout-to-final pipeline.</p>
 
     <!-- ── ZONE 01 ── -->
-    <div class="card-level reveal">
+    <div class="card-level reveal" id="zone-01">
 
       <div class="card-level-top">
         <div class="card-level-image">
@@ -315,7 +329,7 @@
 
 
     <!-- ── ZONE 02 ── -->
-    <div class="card-level reveal">
+    <div class="card-level reveal" id="zone-02">
 
       <div class="card-level-top">
         <div class="card-level-image">
@@ -437,7 +451,7 @@
 
 
     <!-- ── ZONE 03 ── -->
-    <div class="card-level reveal">
+    <div class="card-level reveal" id="zone-03">
 
       <div class="card-level-top">
         <div class="card-level-image">
@@ -576,6 +590,19 @@
       const hint    = el.querySelector('.comparison-hint');
       const counter = wrap.querySelector('.comparison-nav-counter');
       const caption = wrap.querySelector('.cpair-caption');
+      /* The caption bar lists every pair by its data-caption; the current one is
+         marked, and each name jumps straight to its pair. */
+      const names = pairs.map((p, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cpair-name';
+        b.textContent = p.dataset.caption || String(i + 1);
+        b.addEventListener('click', () => showPair(i));
+        return b;
+      });
+      caption.textContent = '';
+      caption.classList.add('as-list');
+      names.forEach(b => caption.appendChild(b));
       const btnPrev = wrap.querySelector('.cpair-prev');
       const btnNext = wrap.querySelector('.cpair-next');
 
@@ -645,7 +672,8 @@
         pairs[current].classList.add('active');
         applyPos(50); // reset to centre on each new pair
         counter.textContent = (current + 1) + ' / ' + pairs.length;
-        caption.textContent = pairs[current].dataset.caption || '';
+        names.forEach((b, i) => b.setAttribute('aria-current', i === current ? 'true' : 'false'));
+        if (caption.scrollWidth > caption.clientWidth) caption.scrollLeft = names[current].offsetLeft - (caption.clientWidth - names[current].offsetWidth) / 2;
         btnPrev.disabled = current === 0;
         btnNext.disabled = current === pairs.length - 1;
         warmNeighbours();
@@ -681,6 +709,55 @@
     }
 
     document.querySelectorAll('.comparison-wrap').forEach(initComparison);
+
+
+    /* ── CHAPTER BAR ──
+       Marks the chapter on screen. On desktop windows taller than 800px it stays
+       pinned; elsewhere it slides away while scrolling down and returns on the
+       way up (or when it takes keyboard focus). After a jump from the bar
+       it stays visible, so the reader keeps their bearings. */
+    (function () {
+      const bar = document.querySelector('.chap-bar');
+      if (!bar) return;
+      const list = bar.querySelector('ol');
+      const links = Array.from(bar.querySelectorAll('a'));
+      const targets = links.map(a => document.querySelector(a.getAttribute('href')));
+      const navH = () => document.querySelector('.nav').offsetHeight;
+      /* Desktop windows taller than 800px have room to keep it pinned for good */
+      const roomy = window.matchMedia('(hover: hover) and (pointer: fine) and (min-height: 801px)');
+      let lastY = window.scrollY, holding = false, holdTimer = 0, ticking = false, active = -1;
+      /* After a jump from the bar, keep it visible until the scroll settles */
+      const hold = ms => { holding = true; clearTimeout(holdTimer); holdTimer = setTimeout(() => { holding = false; }, ms); };
+
+      function update() {
+        ticking = false;
+        const y = window.scrollY;
+        const line = navH() + bar.offsetHeight + 24;
+        let k = -1;
+        /* ignore the reveal offset (translateY) so a card that is still revealing counts where it will land */
+        const topOf = t => { let dy = 0; try { dy = new DOMMatrixReadOnly(getComputedStyle(t).transform).m42; } catch (e) {} return t.getBoundingClientRect().top - dy; };
+        targets.forEach((t, i) => { if (t && topOf(t) <= line) k = i; });
+        if (k !== active) {
+          active = k;
+          links.forEach((a, i) => { if (i === k) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+          const a = links[k];
+          if (a) list.scrollLeft = a.offsetLeft - (list.clientWidth - a.offsetWidth) / 2;
+        }
+        const pinned = bar.getBoundingClientRect().top <= navH() + 1;
+        if (roomy.matches || holding || !pinned || y < lastY - 2) bar.classList.remove('is-hidden');
+        else if (y > lastY + 2 && !bar.contains(document.activeElement)) bar.classList.add('is-hidden');
+        lastY = y;
+      }
+
+      window.addEventListener('scroll', () => {
+        if (holding) hold(250);
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      window.addEventListener('resize', update);
+      links.forEach(a => a.addEventListener('click', () => { hold(400); bar.classList.remove('is-hidden'); }));
+      bar.addEventListener('focusin', () => bar.classList.remove('is-hidden'));
+      update();
+    })();
 
 
     /* ── COMPARISON LIGHTBOX — expand a comparator to fullscreen ── */
