@@ -175,6 +175,7 @@ button {
   --page-max:     1440px;   /* shared content column on wide screens */
   --gutter:       max(var(--section-x), calc((100% - var(--page-max)) / 2)); /* side padding that centres that column */
   --measure:      60ch;     /* line length for 13px running text (≈ 55–75 characters in Inter) */
+  --compare-max:  max(1100px, min(1600px, calc(78vh * 16 / 9))); /* comparator: grows with the screen, never taller than the lightbox view */
   --measure-note: 60ch;     /* line length for 12px notes (≈ 55–65 characters) */
   --nav-height:   52px;
 
@@ -1138,6 +1139,8 @@ button:focus-visible {
    widest allowed column still overflows the image's height. Tightens
    spacing so more content fits without shrinking the image at all. */
 .card-level-body.compact { gap: 8px; padding-top: 22px; padding-bottom: 22px; }
+.card-level-head,
+.card-level-desc { display: flex; flex-direction: column; gap: inherit; }
 .card-level-body.compact .t-body { line-height: 1.55; }
 .card-level-body.compact .zone-points { gap: 3px; }
 .card-level-body.compact li { line-height: 1.45; }
@@ -1586,7 +1589,7 @@ button:focus-visible {
 
 /* ── COMPARISON SLIDER ── */
 .comparison-wrap { position: relative; border-top: var(--hairline) solid var(--color-line); }
-.comparison-wrap .comparison { width: 100%; max-width: 1100px; margin: 0 auto; display: block; }
+.comparison-wrap .comparison { width: 100%; max-width: var(--compare-max); margin: 0 auto; display: block; }
 
 .comparison-nav {
   display: flex; align-items: center; justify-content: center;
@@ -1652,7 +1655,7 @@ body.lightbox-lock { overflow: hidden; }
 }
 .lightbox-overlay.open { display: flex; }
 
-.lightbox-content { width: 100%; max-width: 1100px; }
+.lightbox-content { width: 100%; max-width: max(1100px, calc(78vh * 16 / 9)); }
 .lightbox-content .comparison-wrap { border-top: none; }
 .lightbox-content .comparison-wrap .comparison { max-height: 78vh; }
 
@@ -2107,4 +2110,67 @@ body.lightbox-lock { overflow: hidden; }
     transition: none;
     animation: none;
   }
+}
+
+/* ── LEVEL BREAKDOWN: evidence first ──
+   Desktop: zone cards step 80px past the shared column when the window has
+   room, so the comparator can reach --compare-max (1600px). */
+@media (min-width: 1700px) and (hover: hover) and (pointer: fine) {
+  .card-level { margin-left: -80px; margin-right: -80px; }
+}
+
+/* Stacked cards (tablet, touch, narrow windows): the comparator follows the
+   zone title; narrative, points and tags come after it. The body's frame is
+   split between the head (top corners) and the description (bottom corners). */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+  .card-level { display: flex; flex-direction: column; }
+  .card-level-top,
+  .card-level-body { display: contents; }
+  .card-level-body::before,
+  .card-level-body::after,
+  .card-level-corners { display: none; }
+  .card-level-image  { order: 0; }
+  .card-level-head   { order: 1; }
+  .card-level > .comparison-wrap { order: 2; }
+  .card-level-desc   { order: 3; }
+  .card-level-head,
+  .card-level-desc {
+    position: relative;
+    width: 100%;
+    max-width: min(100%, 640px);
+    margin: 0 auto;
+    padding: var(--space-5);
+    gap: var(--space-3);
+    background: var(--color-bg-raised);
+  }
+  .card-level-head::before,
+  .card-level-head::after,
+  .card-level-desc::before,
+  .card-level-desc::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-color: var(--color-accent-frame);
+    border-style: solid;
+  }
+  .card-level-head::before { top: 10px; left: 10px;     border-width: 1.5px 0 0 1.5px; }
+  .card-level-head::after  { top: 10px; right: 10px;    border-width: 1.5px 1.5px 0 0; }
+  .card-level-desc::before { bottom: 10px; left: 10px;  border-width: 0 0 1.5px 1.5px; }
+  .card-level-desc::after  { bottom: 10px; right: 10px; border-width: 0 1.5px 1.5px 0; }
+}
+
+/* Overview lists, compact when stacked: Tools and Scope side by side under
+   Responsibilities, with tighter padding. */
+@media (max-width: 1024px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  .overview-blocks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+  .overview-text,
+  .overview-block--responsibilities { grid-column: 1 / -1; }
+  .overview-blocks .sidebar-block { margin-bottom: 0; }
+  .overview-blocks .sidebar-block-content { padding: var(--space-3); }
+  .overview-blocks .sidebar-list { gap: 6px; }
 }
