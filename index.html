@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=19">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -134,7 +134,7 @@
 
     <div class="card-featured reveal">
       <div class="card-image">
-        <img src="images/gothic-hero.jpg" alt="Gothic 1 Remake — level overview">
+        <img src="images/gothic-hero.jpg" alt="Gothic 1 Remake — level overview" width="1920" height="1080">
       </div>
       <div class="card-body">
         <div>
@@ -318,6 +318,8 @@
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
       var dpr = window.devicePixelRatio || 1;
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var finished = false;
 
       function resize() {
         canvas.width  = canvas.offsetWidth  * dpr;
@@ -325,7 +327,8 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
       resize();
-      window.addEventListener('resize', function () { ctx.setTransform(1,0,0,1,0,0); resize(); });
+      /* Resizing clears the canvas; once the sweep is over, repaint the final grid once. */
+      window.addEventListener('resize', function () { ctx.setTransform(1,0,0,1,0,0); resize(); if (finished) requestAnimationFrame(draw); });
 
       var CELL=40, DURATION=3800, DELAY=400;
       var PK_V=0.88, PK_H=0.65, RS_V=0.14, RS_H=0.08;
@@ -338,7 +341,7 @@
         var elapsed=ts-startTime-DELAY;
         var W=canvas.offsetWidth, H=canvas.offsetHeight, maxD=W+H;
         ctx.clearRect(0,0,W,H); ctx.fillStyle='#0a0804'; ctx.fillRect(0,0,W,H);
-        var raw=Math.max(0,Math.min(1,elapsed/DURATION)), prog=easeInOut(raw), done=raw>=1;
+        var raw=reduceMotion?1:Math.max(0,Math.min(1,elapsed/DURATION)), prog=easeInOut(raw), done=raw>=1;
 
         for (var x=0;x<=W;x+=CELL) {
           var d=x/maxD, alpha,r,g,b,lw;
@@ -363,7 +366,8 @@
           ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);
           ctx.strokeStyle='rgba('+rH+','+gH+','+bH+','+alphaH+')';ctx.lineWidth=lwH;ctx.stroke();
         }
-        requestAnimationFrame(draw);
+        finished=done;
+        if (!done) requestAnimationFrame(draw); /* stop once the grid has settled */
       }
       requestAnimationFrame(draw);
     })();
