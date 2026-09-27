@@ -176,10 +176,16 @@ button {
   /* Hairline: 1px on standard screens (0.5px there vanishes or renders at
      half strength); true half-pixel only where the screen can draw it. */
   --hairline: 1px;
+  --hairline-drawn: 1px; /* width actually painted for --hairline (borders snap to device pixels) */
 }
 
 @media (min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 2) {
-  :root { --hairline: 0.5px; }
+  :root { --hairline: 0.5px; --hairline-drawn: 0.5px; }
+}
+
+@media (min-resolution: 3dppx), (-webkit-min-device-pixel-ratio: 3) {
+  /* 0.5px snaps to one device pixel (1/3px), which layout stores in 1/64px units as 21/64px */
+  :root { --hairline-drawn: calc(21px / 64); }
 }
 
 
@@ -1697,6 +1703,76 @@ body.lightbox-lock { overflow: hidden; }
     padding-bottom: 16px;
   }
 
+  .nav-logo {
+    padding-top: calc((44px - 1.65em) / 2);
+    padding-bottom: calc((44px - 1.65em) / 2);
+    margin-top: calc((1.65em - 44px) / 2);
+    margin-bottom: calc((1.65em - 44px) / 2);
+  }
+
+  /* Header links (iPad): inline, so padding grows the tap area without moving the
+     line; the side padding is handed back with equal negative margins. */
+  .nav-links a {
+    padding: 15px 4px;
+    margin: 0 -4px;
+  }
+
+  .nav-drawer a {
+    padding-top: calc((44px - 1.65em) / 2);
+    padding-bottom: calc((44px - 1.65em) / 2);
+    margin-top: calc((1.65em - 44px) / 2);
+    margin-bottom: calc((1.65em - 44px) / 2);
+  }
+
+  /* Underlined links: grow upwards only, so the underline (border-bottom) and the
+     text stay exactly where they were. */
+  .link-inline {
+    padding-top: calc(44px - 1.65em - 2px - var(--hairline-drawn));
+    margin-top: calc(1.65em + 2px + var(--hairline-drawn) - 44px);
+  }
+
+  /* Framed buttons: the element grows to 44px with no top/bottom border and
+     ::before redraws the original frame where it was. --hairline-drawn is the
+     painted border width, so the redrawn frame lands on the same device pixels. */
+  .btn,
+  .link-ghost {
+    position: relative;
+    isolation: isolate;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    background: transparent;
+    padding-top: calc((44px - 1.65em) / 2);
+    padding-bottom: calc((44px - 1.65em) / 2);
+  }
+  .btn        { --frame-h: calc(1.65em + 20px + 2 * var(--hairline-drawn)); }
+  .link-ghost { --frame-h: calc(1.65em + 24px + 2 * var(--hairline-drawn)); }
+  .btn,
+  .link-ghost {
+    margin-top: calc((var(--frame-h) - 44px) / 2);
+    margin-bottom: calc((var(--frame-h) - 44px) / 2);
+  }
+  .btn::before,
+  .link-ghost::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: calc((44px - var(--frame-h)) / 2);
+    bottom: calc((44px - var(--frame-h)) / 2);
+    left: calc(-1 * var(--hairline-drawn));
+    right: calc(-1 * var(--hairline-drawn));
+    border: var(--hairline) solid;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-base), border-color var(--transition-base);
+  }
+  .btn::before        { border-color: var(--color-accent-border); }
+  .link-ghost::before { border-color: var(--color-line); }
+  .btn:hover,
+  .link-ghost:hover { background: transparent; border-left-color: transparent; border-right-color: transparent; }
+  .btn:hover::before,
+  .link-ghost:hover::before { background: var(--color-accent-dim); border-color: var(--color-accent); }
+
   .cpair-btn {
     position: relative;
     width: 44px;
@@ -1736,6 +1812,26 @@ body.lightbox-lock { overflow: hidden; }
 
   .cpair-btn svg,
   .comparison-expand svg { position: relative; } /* icon above its ::before square */
+
+  .lightbox-close {
+    width: 44px;
+    height: 44px;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: 0;
+  }
+  .lightbox-close::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: rgba(13,13,13,0.75);
+    border: var(--hairline) solid var(--color-control-border);
+    border-radius: 50%;
+    transition: border-color var(--transition-base);
+  }
+  .lightbox-close:hover::before { border-color: var(--color-accent-border); }
+  .lightbox-close svg { position: relative; }
 }
 
 /* ── LEVEL BREAKDOWN: compare + video side by side ── */
