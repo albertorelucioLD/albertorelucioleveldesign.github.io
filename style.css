@@ -172,6 +172,10 @@ button {
   --section-y:    80px;
   --section-x:    40px;
   --content-max:  1160px;   /* max width for readable content */
+  --page-max:     1440px;   /* shared content column on wide screens */
+  --gutter:       max(var(--section-x), calc((100% - var(--page-max)) / 2)); /* side padding that centres that column */
+  --measure:      60ch;     /* line length for 13px running text (≈ 55–75 characters in Inter) */
+  --measure-note: 60ch;     /* line length for 12px notes (≈ 55–65 characters) */
   --nav-height:   52px;
 
   /* Transitions */
@@ -270,6 +274,7 @@ button {
 }
 
 .t-body p + p { margin-top: var(--space-4); }
+.t-body { max-width: var(--measure); }
 
 .t-meta {
   font-size: var(--text-xs);
@@ -406,7 +411,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--section-x);
+  padding: 0 var(--gutter);
   background: var(--color-nav-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -689,7 +694,7 @@ button:focus-visible {
   Content inside uses .wrap to cap at --content-max.
 */
 .section {
-  padding: var(--section-y) var(--section-x);
+  padding: var(--section-y) var(--gutter);
 }
 
 .section--raised    { background: var(--color-bg-raised); }
@@ -912,7 +917,7 @@ button:focus-visible {
 
 /* Page header (gothic.html) */
 .page-header {
-  padding: calc(var(--nav-height) + 70px) var(--section-x) 56px;
+  padding: calc(var(--nav-height) + 70px) var(--gutter) 56px;
   background: var(--color-bg-warm);
   position: relative;
   overflow: hidden;
@@ -980,6 +985,7 @@ button:focus-visible {
   background: var(--color-bg);
   position: relative;
   z-index: 2;
+  padding: 0 max(0px, calc((100% - var(--page-max)) / 2)); /* cells on the shared column past --page-max; 0 below it */
 }
 
 .stat-item {
@@ -1243,6 +1249,7 @@ button:focus-visible {
   color: var(--color-text-dim);
   line-height: 1.65;
 }
+.process-desc { max-width: var(--measure-note); }
 
 /* Sidebar blocks */
 .sidebar-block {
@@ -1359,6 +1366,7 @@ button:focus-visible {
   color: var(--color-text-dim);
   line-height: 1.6;
 }
+.timeline-note { max-width: var(--measure-note); }
 
 
 /* ============================================================
@@ -1400,7 +1408,7 @@ button:focus-visible {
    ============================================================ */
 
 .footer {
-  padding: 20px var(--section-x);
+  padding: 20px var(--gutter);
   border-top: var(--hairline) solid var(--color-line);
   background: var(--color-bg-raised);
   display: flex;
@@ -1420,7 +1428,7 @@ button:focus-visible {
 }
 
 .page-footer {
-  padding: 44px var(--section-x);
+  padding: 44px var(--gutter);
   border-top: var(--hairline) solid var(--color-line);
   background: var(--color-bg-raised);
   display: flex;
@@ -1920,7 +1928,7 @@ body.lightbox-lock { overflow: hidden; }
 .overview-block--tools { max-width: 300px; }
 .overview-block--scope { max-width: 320px; }
 
-.breakdown-intro { max-width: 680px; }
+.breakdown-intro { max-width: var(--measure); }
 
 /* Zone card bullet points */
 .zone-points {
@@ -1930,6 +1938,11 @@ body.lightbox-lock { overflow: hidden; }
   gap: 6px;
   margin-bottom: var(--space-5);
 }
+.zone-points { max-width: var(--measure-note); }
+/* Zone cards: the text column is already sized by the card (JS fits it to the image height),
+   so its paragraphs follow the column instead of the global measure. */
+.card-level-body .t-body,
+.card-level-body .zone-points { max-width: none; }
 .zone-points > li {
   font-size: 0.75rem;
   color: var(--color-text-dim);
@@ -2081,5 +2094,17 @@ body.lightbox-lock { overflow: hidden; }
   }
   .card-level-body {
     flex: 0 1 auto;
+  }
+}
+
+/* ── PRINT ── Scroll-reveal blocks may still be hidden when printing or
+   saving as PDF (never scrolled into view); show them in their final state. */
+@media print {
+  .reveal,
+  .js-reveal .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
   }
 }
