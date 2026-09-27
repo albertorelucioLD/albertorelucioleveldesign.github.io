@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=24">
+  <link rel="stylesheet" href="style.css?v=25">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -28,7 +28,7 @@
   <main>
   <div class="page-header">
     <div class="page-header-grid"></div>
-    <canvas id="gothic-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
+    <canvas id="gothic-canvas" class="page-header-canvas"></canvas>
     <div class="page-header-fade"></div>
     <div class="page-header-content">
       <div class="breadcrumb">
@@ -55,16 +55,16 @@
   <div class="section section--bordered">
     <h2 class="eyebrow">Overview</h2>
     <!-- Single row: text left, three blocks right, always side by side -->
-    <div class="overview-blocks" style="display:flex; flex-wrap:wrap; gap:var(--space-10); align-items:stretch; justify-content:space-between;">
+    <div class="overview-blocks">
 
-      <div class="t-body" style="width:420px; flex-shrink:0;">
+      <div class="t-body overview-text">
         <p>Gothic 1 Remake is a full AAA reconstruction of the 2001 RPG classic, rebuilt in Unreal Engine 5 with modernised gameplay and fully redesigned levels faithful to the original world while improving navigation, readability and systemic depth.</p>
         <p>I joined Alkimia Interactive in May 2020 as Level Designer and have been part of the project since pre-production. My work spans the entire blockout-to-final pipeline for multiple zones across the Colony — from macro layout decisions to detailed blockouts, LD documentation and puzzle integration with the quest systems.</p>
         <p>Over six years I collaborated closely with art, narrative and systems teams to ensure every space served both gameplay clarity and the atmospheric density the original was known for.</p>
         <p class="credit-note">Environmental dressing, lighting and final art pass were carried out by the Environment Art team. The LD team conducted multiple review rounds to ensure art iteration remained faithful to the proposed layout and design intent. Where necessary, direct edits were made to dressed environments to improve navigation flow and spatial readability.</p>
       </div>
 
-      <div class="sidebar-block" style="flex:1; max-width:340px;">
+      <div class="sidebar-block overview-block overview-block--responsibilities">
         <div class="sidebar-block-label">Responsibilities</div>
         <div class="sidebar-block-content">
           <ul class="sidebar-list">
@@ -78,7 +78,7 @@
         </div>
       </div>
 
-      <div class="sidebar-block" style="flex:1; max-width:300px;">
+      <div class="sidebar-block overview-block overview-block--tools">
         <div class="sidebar-block-label">Blockout tools</div>
         <div class="sidebar-block-content">
           <ul class="sidebar-list">
@@ -91,7 +91,7 @@
         </div>
       </div>
 
-      <div class="sidebar-block" style="flex:1; max-width:320px;">
+      <div class="sidebar-block overview-block overview-block--scope">
         <div class="sidebar-block-label">Scope</div>
         <div class="sidebar-block-content">
           <ul class="sidebar-list">
@@ -175,7 +175,7 @@
   ══════════════════════════════════════════════════════════════ --> 
   <div class="section section--raised section--bordered">
     <h2 class="eyebrow">Level breakdown</h2>
-    <p class="t-body mb-10" style="max-width:680px;">A selection of zones from across the Valley of Mines, chosen to show range across typologies — open world, interior, hub and dungeon. I worked on over 18 zones throughout the project; these highlight key design decisions and the blockout-to-final pipeline.</p>
+    <p class="t-body mb-10 breakdown-intro">A selection of zones from across the Valley of Mines, chosen to show range across typologies — open world, interior, hub and dungeon. I worked on over 18 zones throughout the project; these highlight key design decisions and the blockout-to-final pipeline.</p>
 
     <!-- ── ZONE 01 ── -->
     <div class="card-level reveal">
@@ -191,24 +191,24 @@
           <div class="card-level-number">Zone 01</div>
           <h3 class="t-subtitle">The Old Camp</h3>
           <div class="card-level-type">Open World Hub · Faction Headquarters · Multi-storey Castle</div>
-          <p class="t-body" style="margin-bottom:var(--space-4);">
+          <p class="t-body mb-4">
             The Old Camp is the game's primary social and political hub — the first major space the player is guided toward, and the most layered in terms of faction hierarchy, access gating and environmental storytelling. My work covered the full zone from the outer circle through to the castle interior, underground areas and dungeon.
           </p>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:var(--space-5);">
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+          <ul class="zone-points">
+            <li>
+              <span>—</span>
               Designed the outer circle layout around four distinct functional areas — north entry, arena, smithy and merchants — each with its own landmark logic and NPC congregation points to make the space legible without a minimap.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Structured the castle as a verticality system: outer yard → first floor → second floor → big tower, with access gated by social progression rather than keys alone, so the space itself communicated the player's status within the faction.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Designed and documented the zone's puzzle systems: a hidden lever in the merchant's backroom revealing a secret passage to Gomez's wine cellar, a torch-lever secret in the fallen tower with an alternative meatbug-hole bypass, and a second torch-lever puzzle accessing a hidden torture room in the dungeons.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Produced full LD documentation covering subzone layouts, item placement across 62+ huts, environmental mechanics (melee, magic, climbing) and obstacle design for all vertical and underground spaces.
             </li>
           </ul>
@@ -324,20 +324,20 @@
           <div class="card-level-number">Zone 02</div>
           <h3 class="t-subtitle">The Sleeper's Temple</h3>
           <div class="card-level-type">Underground Dungeon · Four Subzones · Boss Arena</div>
-          <p class="t-body" style="margin-bottom:var(--space-4);">
+          <p class="t-body mb-4">
             The Sleeper's Temple is the game's climactic underground dungeon, spanning four interconnected subzones beneath the Orc town. The Remake expands on the original with new spatial layers, environmental mechanics and a wider variety of puzzle systems.
           </p>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:var(--space-5);">
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+          <ul class="zone-points">
+            <li>
+              <span>—</span>
               Redesigned the full zone layout across four subzones, introducing a Minecrawler tunnel network as an alternative traversal layer and a Stronghold interior section as the final beat before the Sleeper's chamber.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Designed the full puzzle system for the Remake: symbol-based cryptext and statue rotation puzzles, a pattern-matching arena in the Varrag Kasorg chamber, a fluid-routing Blood Canal mechanic gating the third subzone, and environmental traversal puzzles tied to the Torture Pillars and Lava Extractor.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Produced full LD documentation covering all four subzones — layouts, 30+ landmarks and POIs, enemy distribution, puzzle breakdowns and dual item placement layouts (with and without tunnel system).
             </li>
           </ul>
@@ -442,20 +442,20 @@
           <div class="card-level-number">Zone 03</div>
           <h3 class="t-subtitle">Open World & Transition Areas</h3>
           <div class="card-level-type">Open World · Transition Zones · Quest Hub</div>
-          <p class="t-body" style="margin-bottom:var(--space-4);">
+          <p class="t-body mb-4">
             The Tundra, Fisherman's Lake, and the Monastery represent interconnected landmark expansions designed to enrich the original world's layout and reward organic navigation.
           </p>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:var(--space-5);">
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+          <ul class="zone-points">
+            <li>
+              <span>—</span>
               Expanded the northern territory by introducing the Tundra section, a seamless vertical layer featuring a climbable mountain path, an open frosted wooded area anchored by a central waterfall, and a hidden shrine tucked behind the falls, meticulously paced to reward curiosity without hand-holding.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Shaped the Fisherman's Lake and the Monastery grounds as connective spaces — using terrain silhouette, water placement and sightlines to give each area its own identity while keeping it legible as a transition rather than a destination.
             </li>
-            <li style="font-size:0.75rem;color:rgba(232,228,220,0.6);display:flex;gap:8px;align-items:baseline;">
-              <span style="color:var(--color-accent);flex-shrink:0;">—</span>
+            <li>
+              <span>—</span>
               Worked primarily through UE Landscape tooling and organic mesh placement for these areas — a different blockout language to the architectural zones, focused on silhouette, pacing and natural sightlines rather than hard geometry.
             </li>
           </ul>
@@ -549,7 +549,7 @@
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6H2M6 10L2 6l4-4"/></svg>
       Back to portfolio
     </a>
-    <span class="footer-label" style="font-family:var(--font-head);font-size:var(--text-sm);">Alberto Relucio · Senior Level Designer</span>
+    <span class="footer-label">Alberto Relucio · Senior Level Designer</span>
   </div>
 
 

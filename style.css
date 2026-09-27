@@ -226,6 +226,8 @@ button {
   line-height: 1;
 }
 
+.t-heading--cta { font-size: var(--text-cta); } /* "Get in touch" */
+
 .t-title {
   font-family: var(--font-head);
   font-weight: 700;
@@ -257,6 +259,8 @@ button {
   color: var(--color-text-muted);
   letter-spacing: var(--tracking-normal);
 }
+
+.project-meta { letter-spacing: 0.04em; } /* studio · dates line on the featured card */
 
 .eyebrow {
   font-size: var(--text-label);
@@ -703,6 +707,16 @@ button:focus-visible {
     The SVG animation will still play underneath as a fallback.
   */
   background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .hero-grid {
@@ -725,19 +739,6 @@ button:focus-visible {
     rgba(13,13,13,0.25) 60%,
     transparent 100%
   );
-}
-
-/* Hero — centred single column variant */
-.hero-inner--centered {
-  grid-template-columns: 1fr;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0;
-  /* Override grid padding from hero-inner */
-  padding-left: 0;
-  padding-right: 0;
 }
 
 .hero-diamond-wrap {
@@ -802,20 +803,24 @@ button:focus-visible {
   flex-shrink: 0;
 }
 
-/* Centred variant overrides — fills the full hero height */
-.hero-inner--centered {
-  grid-template-columns: 1fr !important;
-  align-items: center !important;
-  justify-items: center !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  flex: 1 !important;
-  padding: 0 !important;
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
+/* Centred variant — fills the full hero height. Two classes outrank every
+   .hero-inner rule, including the later media-query ones, with no override flags. */
+.hero-inner.hero-inner--centered {
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+  max-width: 100%;
+  height: 100%;
+  flex: 1;
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+.hero-actions { justify-content: center; }
+.hero-actions .link-inline { align-self: center; }
 
 /* Left: who you are */
 .hero-identity {
@@ -895,6 +900,14 @@ button:focus-visible {
   position: relative;
   overflow: hidden;
   border-bottom: var(--hairline) solid var(--color-line);
+}
+
+.page-header-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .page-header-grid {
@@ -1103,7 +1116,7 @@ button:focus-visible {
    spacing so more content fits without shrinking the image at all. */
 .card-level-body.compact { gap: 8px; padding-top: 22px; padding-bottom: 22px; }
 .card-level-body.compact .t-body { line-height: 1.55; }
-.card-level-body.compact ul { gap: 3px !important; }
+.card-level-body.compact .zone-points { gap: 3px; }
 .card-level-body.compact li { line-height: 1.45; }
 
 .card-level-body::before,
@@ -1381,6 +1394,7 @@ button:focus-visible {
 }
 
 .footer-copy  { font-size: var(--text-xs); color: var(--color-text-muted); }
+.page-footer .footer-label { font-family: var(--font-head); font-size: var(--text-sm); }
 .footer-label {
   font-size: var(--text-label);
   letter-spacing: var(--tracking-label);
@@ -1785,6 +1799,39 @@ body.lightbox-lock { overflow: hidden; }
   }
 }
 
+/* ── GOTHIC OVERVIEW — text column beside three blocks ── */
+.overview-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  align-items: stretch;
+  justify-content: space-between;
+}
+.overview-text { width: 420px; flex-shrink: 0; }
+.overview-block { flex: 1; }
+.overview-block--responsibilities { max-width: 340px; }
+.overview-block--tools { max-width: 300px; }
+.overview-block--scope { max-width: 320px; }
+
+.breakdown-intro { max-width: 680px; }
+
+/* Zone card bullet points */
+.zone-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-5);
+}
+.zone-points > li {
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.zone-points > li > span { color: var(--color-accent); flex-shrink: 0; }
+
 /* ── GOTHIC OVERVIEW — Environment Art credit under the text ── */
 .credit-note {
   font-size: 0.7rem;
@@ -1797,24 +1844,23 @@ body.lightbox-lock { overflow: hidden; }
 /* ── GOTHIC OVERVIEW BLOCKS — mobile stack ── */
 @media (max-width: 768px), (max-height: 700px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
   .overview-blocks {
-    flex-direction: column !important;
-    gap: var(--space-3) !important;
+    flex-direction: column;
+    gap: var(--space-3);
   }
 
   .overview-blocks .sidebar-block {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    flex: none !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: none;
   }
 
   /* Text column full width on mobile, but capped for readable line-length in landscape */
-  .overview-blocks ~ div,
-  [style*="width:420px"] {
-    width: 100% !important;
-    max-width: min(100%, 640px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+  .overview-text {
+    width: 100%;
+    max-width: min(100%, 640px);
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -1884,21 +1930,20 @@ body.lightbox-lock { overflow: hidden; }
    regardless of orientation or device height. */
 @media (max-width: 1024px) {
   .overview-blocks {
-    flex-direction: column !important;
-    gap: var(--space-3) !important;
+    flex-direction: column;
+    gap: var(--space-3);
   }
   .overview-blocks .sidebar-block {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    flex: none !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: none;
   }
-  .overview-blocks ~ div,
-  [style*="width:420px"] {
-    width: 100% !important;
-    max-width: min(100%, 640px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+  .overview-text {
+    width: 100%;
+    max-width: min(100%, 640px);
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 

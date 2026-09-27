@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=24">
+  <link rel="stylesheet" href="style.css?v=25">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -40,8 +40,8 @@
   <main>
   <!-- HERO -->
   <section class="hero" id="hero">
-    <div class="hero-bg" style="position:absolute;inset:0;width:100%;height:100%;">
-      <canvas id="hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+    <div class="hero-bg">
+      <canvas id="hero-canvas" class="hero-canvas"></canvas>
     </div>
     <div class="hero-gradient"></div>
 
@@ -97,9 +97,9 @@
           7+ years designing open-world RPG levels.<br>
           Currently at Alkimia Interactive.
         </p>
-        <div class="flex-row flex-wrap gap-3 mt-4" style="justify-content:center;">
+        <div class="flex-row flex-wrap gap-3 mt-4 hero-actions">
           <a href="#work"    class="btn">View work</a>
-          <a href="#contact" class="link-inline" style="align-self:center">Get in touch</a>
+          <a href="#contact" class="link-inline">Get in touch</a>
         </div>
       </div>
 
@@ -141,7 +141,7 @@
         <div>
           <div class="tag mb-4">AAA · Open World · RPG</div>
           <h2 class="t-title mb-3">Gothic 1<br>Remake</h2>
-          <p class="t-meta mb-6" style="letter-spacing:0.04em;">Alkimia Interactive &nbsp;·&nbsp; 2020 – June 2026</p>
+          <p class="t-meta project-meta mb-6">Alkimia Interactive &nbsp;·&nbsp; 2020 – June 2026</p>
           <p class="t-body mb-8">
             World blockout and level design for the AAA remake of the classic RPG, released
             June 5, 2026. Worked within the level design team recreating the Colony across its
@@ -248,7 +248,7 @@
     <div>
       <div class="eyebrow">About</div>
       <h2 class="t-heading mb-2">Alberto<br>Relucio</h2>
-      <p class="tag mb-6" style="letter-spacing:0.2em;">Senior Level Designer</p>
+      <p class="tag mb-6">Senior Level Designer</p>
       <div class="t-body">
         <p>Senior Level Designer with 7+ years in the games industry. Currently at Alkimia Interactive, where I spent six years contributing to Gothic 1 Remake alongside the LD team — from early blockouts through to ship.</p>
         <p>Specialised in open-world RPG layout, blockout-to-final pipelines, and LD documentation. Degree in Interactive Product Design with a focus on game design — final thesis on level design in Resident Evil, awarded with Distinction.</p>
@@ -258,7 +258,7 @@
 
     <div>
       <div class="eyebrow">Skills &amp; tools</div>
-      <div style="margin-bottom:var(--space-8);">
+      <div class="mb-8">
         <div class="stat-label mb-3">Level Design</div>
         <div class="flex-row flex-wrap gap-2">
           <span class="skill-tag">World Layout</span>
@@ -270,7 +270,7 @@
           <span class="skill-tag">RPG Design</span>
         </div>
       </div>
-      <div style="margin-bottom:var(--space-8);">
+      <div class="mb-8">
         <div class="stat-label mb-3">Tools</div>
         <div class="flex-row flex-wrap gap-2">
           <span class="skill-tag">Unreal Engine 5</span>
@@ -295,7 +295,7 @@
   <!-- CONTACT -->
   <section class="section section--bordered section--center" id="contact">
     <div class="eyebrow centered">Contact</div>
-    <h2 class="t-heading mb-2" style="font-size:var(--text-cta);">Get in touch</h2>
+    <h2 class="t-heading t-heading--cta mb-2">Get in touch</h2>
     <p class="t-meta mb-10">Feel free to reach out via email or find me on the links below.</p>
     <div class="contact-links">
       <!-- REPLACE with your real details -->
