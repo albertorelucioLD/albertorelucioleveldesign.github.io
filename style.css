@@ -2081,23 +2081,56 @@ body.lightbox-lock { overflow: hidden; }
 @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
   .card-level-top {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
   }
+  /* 1025–1699px: the header image fills the full card height (cover), cropped
+     around its focal point; the text column keeps a readable width. */
   .card-level-image {
-    flex: 0 0 38%;
-    max-width: 38%;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
     height: auto;
     padding-top: 0;
-    aspect-ratio: 16 / 9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-right: var(--hairline) solid var(--color-line);
     border-bottom: none;
   }
   .card-level-body {
-    flex: 0 1 auto;
+    flex: 0 0 clamp(520px, 40%, 720px);
+    max-width: none;
   }
+  .card-level-desc { flex: 1; }
+  .card-level-desc > .flex-row { margin-top: auto; } /* tags close the column; any spare height sits above them */
+
+  /* Home featured card: same rule */
+  .card-featured { grid-template-columns: minmax(0, 1fr) 520px; }
+  .card-image { height: auto; padding-top: 0; align-self: stretch; }
+}
+
+/* 1700px and up: header images keep 16:9 with no crop, at one common size per
+   page. JS picks the smallest width at which every text column fits beside
+   its image; the text panel then stretches to the image height. */
+@media (min-width: 1700px) and (hover: hover) and (pointer: fine) {
+  .card-level-image {
+    flex: 0 0 var(--header-img-w, 62%);
+    aspect-ratio: 16 / 9;
+    align-self: flex-start;
+  }
+  .card-level-body {
+    flex: 1 1 0;
+    min-width: 420px;
+    max-width: 720px;
+  }
+  .card-featured { grid-template-columns: var(--header-img-w, minmax(0, 1fr)) minmax(0, 1fr); }
+  .card-image { aspect-ratio: 16 / 9; align-self: start; }
+}
+
+/* Focal points for header images when cover crops them (desktop 1025–1699px).
+   Desktop only: on tablet and mobile the frames are 16:9 and stay untouched. */
+@media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
+  .card-level-image img[src*="OldCamp"]       { object-position: 62% 50%; } /* the castle tower */
+  .card-level-image img[src*="SleeperTemple"] { object-position: 50% 50%; } /* the altar */
+  .card-level-image img[src*="Tundra"]        { object-position: 50% 55%; } /* the clearing */
+  .card-image img                             { object-position: 50% 50%; } /* the four heroes and the logo */
 }
 
 /* ── PRINT ── Scroll-reveal blocks may still be hidden when printing or

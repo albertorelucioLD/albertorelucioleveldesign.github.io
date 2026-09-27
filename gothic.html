@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=30">
+  <link rel="stylesheet" href="style.css?v=32">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -773,76 +773,36 @@
     })();
 
 
-    /* ── ZONE CARD: fit text column width to the image's height (desktop only) ──
-       The image column stays a fixed proportion of the card — it never
-       stretches or crops to match the text. This measures the image's
-       rendered height, then binary-searches the text column's width until
-       the text's content height fits within it. If even the widest allowed
-       column still overflows (zones with a lot of copy), it falls back to
-       tighter spacing (.compact) and searches again — the photo's size is
-       never touched either way. */
+    /* ── ZONE CARD HEADERS (desktop with a mouse) ──
+       1025–1699px: CSS lets the image fill the card height (cover, focal point).
+       1700px and up: the three header images share one 16:9 size with no crop;
+       this picks the smallest width at which every zone's text fits beside its
+       image, so no card is left with a gap under the image. */
     (function () {
-      const isDesktop = () => window.matchMedia('(min-width: 1025px) and (hover: hover) and (pointer: fine)').matches;
+      const desktop = window.matchMedia('(min-width: 1025px) and (hover: hover) and (pointer: fine)');
+      const wide    = window.matchMedia('(min-width: 1700px) and (hover: hover) and (pointer: fine)');
 
-      function searchWidth(bodyEl, minWidth, maxWidth, targetHeight) {
-        let lo = minWidth, hi = maxWidth, best = null;
-        for (let i = 0; i < 16; i++) {
-          const mid = Math.round((lo + hi) / 2);
-          bodyEl.style.width = mid + 'px';
-          const h = bodyEl.scrollHeight;
-          if (h <= targetHeight) { best = mid; hi = mid; }
-          else { lo = mid; }
+      function sizeHeaders() {
+        const tops = [...document.querySelectorAll('.card-level-top')];
+        const bodies = tops.map(t => t.querySelector('.card-level-body'));
+        bodies.forEach(b => b.classList.toggle('compact', desktop.matches));
+        tops.forEach(t => t.style.removeProperty('--header-img-w'));
+        if (!wide.matches || !tops.length) return;
+
+        const card = tops[0].getBoundingClientRect().width;
+        let width = card - 420;
+        tops.forEach(t => { t.style.alignItems = 'flex-start'; });   // measure natural text heights
+        for (let w = Math.ceil(card - 720); w <= card - 420; w += 2) {
+          tops.forEach(t => t.style.setProperty('--header-img-w', w + 'px'));
+          if (bodies.every(b => b.offsetHeight <= w * 9 / 16)) { width = w; break; }
         }
-        return best; // null means nothing in range satisfied the target height
+        tops.forEach(t => { t.style.setProperty('--header-img-w', width + 'px'); t.style.alignItems = ''; });
       }
 
-      function fitCard(wrap) {
-        const imageEl = wrap.querySelector('.card-level-image');
-        const bodyEl  = wrap.querySelector('.card-level-body');
-        if (!imageEl || !bodyEl) return;
-
-        bodyEl.classList.remove('compact');
-
-        if (!isDesktop()) {
-          bodyEl.style.width = '';
-          return;
-        }
-
-        const targetHeight = imageEl.offsetHeight;
-        const cardWidth    = wrap.offsetWidth;
-        const imageWidth   = imageEl.offsetWidth;
-        const maxWidth     = Math.max(280, cardWidth - imageWidth - 4);
-        const minWidth     = 280;
-
-        if (targetHeight <= 0 || maxWidth <= minWidth) { bodyEl.style.width = ''; return; }
-
-        let best = searchWidth(bodyEl, minWidth, maxWidth, targetHeight);
-
-        if (best === null) {
-          /* Doesn't fit at any width — tighten spacing and try again rather
-             than letting the text spill past the photo's height. */
-          bodyEl.classList.add('compact');
-          best = searchWidth(bodyEl, minWidth, maxWidth, targetHeight);
-        }
-
-        /* Still doesn't fit even compact: use the widest allowed column so
-           at least the overflow is as small as possible, rather than a
-           narrow, badly-wrapped block of text. */
-        bodyEl.style.width = (best !== null ? best : maxWidth) + 'px';
-      }
-
-      function fitAll() {
-        document.querySelectorAll('.card-level-top').forEach(fitCard);
-      }
-
-      fitAll();
-      window.addEventListener('load', fitAll);
-
+      sizeHeaders();
+      window.addEventListener('load', sizeHeaders);
       let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(fitAll, 150);
-      });
+      window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(sizeHeaders, 150); });
     })();
 
 

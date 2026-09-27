@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=30">
+  <link rel="stylesheet" href="style.css?v=32">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -532,6 +532,31 @@
   </script>
 
   <script>
+    /* ── FEATURED CARD (desktop with a mouse, 1700px and up) ──
+       The image keeps 16:9 with no crop: pick the smallest image column at which
+       the text fits beside it, so there is no gap under the image. */
+    (function () {
+      const wide = window.matchMedia('(min-width: 1700px) and (hover: hover) and (pointer: fine)');
+      function sizeCard() {
+        const card = document.querySelector('.card-featured'); if (!card) return;
+        card.style.removeProperty('--header-img-w');
+        if (!wide.matches) return;
+        const body = card.querySelector('.card-body'), W = card.getBoundingClientRect().width;
+        const need = () => body.offsetHeight;   // natural text height (measured unstretched)
+        body.style.alignSelf = 'start';
+        let width = Math.round(W / 2);
+        for (let w = Math.round(W / 2); w <= W - 420; w += 2) {
+          card.style.setProperty('--header-img-w', w + 'px');
+          if (need() <= w * 9 / 16) { width = w; break; }
+        }
+        card.style.setProperty('--header-img-w', width + 'px');
+        body.style.alignSelf = '';
+      }
+      sizeCard();
+      window.addEventListener('load', sizeCard);
+      let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(sizeCard, 150); });
+    })();
+
     /* ── SCROLL REVEAL ── (same observer as gothic.html) */
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
