@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -554,46 +554,6 @@
 
 
   <script>
-    /* ── SCREENSHOT SLIDESHOW (auto-advance) ── */
-    function initSlideshow(el) {
-      const slides   = Array.from(el.querySelectorAll('.slide'));
-      const dotsWrap = el.querySelector('.slide-dots');
-      const counter  = el.querySelector('.slide-counter');
-      let current = 0, timer;
-
-      slides.forEach((_, i) => {
-        const d = document.createElement('button');
-        d.className = 'slide-dot' + (i === 0 ? ' active' : '');
-        d.setAttribute('aria-label', 'Slide ' + (i + 1));
-        d.addEventListener('click', () => go(i));
-        dotsWrap.appendChild(d);
-      });
-
-      function go(n) {
-        slides[current].classList.remove('active');
-        current = (n + slides.length) % slides.length;
-        slides[current].classList.add('active');
-        dotsWrap.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === current));
-        counter.textContent = (current + 1) + ' / ' + slides.length;
-        clearInterval(timer);
-        timer = setInterval(() => go(current + 1), 5000);
-      }
-
-      el.querySelector('.slide-btn-prev').addEventListener('click', () => go(current - 1));
-      el.querySelector('.slide-btn-next').addEventListener('click', () => go(current + 1));
-      el.setAttribute('tabindex', '0');
-      el.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  go(current - 1);
-        if (e.key === 'ArrowRight') go(current + 1);
-      });
-
-      counter.textContent = '1 / ' + slides.length;
-      timer = setInterval(() => go(current + 1), 5000);
-    }
-
-    document.querySelectorAll('.slideshow').forEach(initSlideshow);
-
-
     /* ── COMPARISON SLIDER with pair navigation ── */
     function initComparison(wrap) {
       const el      = wrap.querySelector('[data-comparison]');
