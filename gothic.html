@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -25,6 +25,7 @@
 
 
   <!-- PAGE HEADER -->
+  <main>
   <div class="page-header">
     <div class="page-header-grid"></div>
     <canvas id="gothic-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
@@ -52,7 +53,7 @@
 
   <!-- OVERVIEW -->
   <div class="section section--bordered">
-    <div class="eyebrow">Overview</div>
+    <h2 class="eyebrow">Overview</h2>
     <!-- Single row: text left, three blocks right, always side by side -->
     <div class="overview-blocks" style="display:flex; flex-wrap:wrap; gap:var(--space-10); align-items:stretch; justify-content:space-between;">
 
@@ -112,7 +113,7 @@
 
   <!-- TRAILER -->
   <section class="section section--bordered">
-    <div class="eyebrow mb-6">Trailer</div>
+    <h2 class="eyebrow mb-6">Trailer</h2>
     <div class="trailer-wrap">
       <iframe
         src="https://www.youtube.com/embed/n0R7BmfpD7k"
@@ -126,7 +127,7 @@
 
     <!-- DESIGN PROCESS -->
   <div class="section section--bordered">
-    <div class="eyebrow">Design process</div>
+    <h2 class="eyebrow">Design process</h2>
     <div class="process-grid">
       <div class="process-step">
         <div class="process-num">01</div>
@@ -173,7 +174,7 @@
        Duplicate the entire <!-- ZONE 0X --> <!-- comment block.
   ══════════════════════════════════════════════════════════════ --> 
   <div class="section section--raised section--bordered">
-    <div class="eyebrow">Level breakdown</div>
+    <h2 class="eyebrow">Level breakdown</h2>
     <p class="t-body mb-10" style="max-width:680px;">A selection of zones from across the Valley of Mines, chosen to show range across typologies — open world, interior, hub and dungeon. I worked on over 18 zones throughout the project; these highlight key design decisions and the blockout-to-final pipeline.</p>
 
     <!-- ── ZONE 01 ── -->
@@ -530,6 +531,7 @@
 
 
   </div><!-- end Level breakdown -->
+  </main>
 
 
   <!-- COMPARISON LIGHTBOX (shared overlay — the active comparator moves in here on expand) -->
@@ -644,7 +646,26 @@
         handle.style.left   = pos + '%';
         handle.style.top    = '50%';
         handle.style.transform = 'translate(-50%, -50%)';
+        handle.setAttribute('aria-valuenow', Math.round(pos));
+        handle.setAttribute('aria-valuetext', Math.round(pos) + '%');
       }
+
+      /* Keyboard: the handle is the slider thumb. Tab reaches it; ← → move the
+         divider 5%, Home / End send it to either edge. */
+      handle.setAttribute('role', 'slider');
+      handle.setAttribute('tabindex', '0');
+      handle.setAttribute('aria-valuemin', '0');
+      handle.setAttribute('aria-valuemax', '100');
+      handle.setAttribute('aria-label', (wrap.querySelector('.comparison-nav-label') || {}).textContent || 'Blockout vs in-game');
+      handle.addEventListener('keydown', e => {
+        const step = { ArrowLeft: -5, ArrowRight: 5 }[e.key];
+        if (step !== undefined) applyPos(pos + step);
+        else if (e.key === 'Home') applyPos(0);
+        else if (e.key === 'End') applyPos(100);
+        else return;
+        e.preventDefault();
+        hideHint();
+      });
 
       function showPair(n) {
         pairs[current].classList.remove('active');
@@ -697,18 +718,27 @@
       const closeBtn = document.getElementById('lightbox-close');
       if (!overlay || !content || !closeBtn) return;
 
-      let movedEl = null, originalParent = null, originalNext = null;
+      let movedEl = null, originalParent = null, originalNext = null, opener = null;
 
-      function openLightbox(wrap) {
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+
+      function openLightbox(wrap, trigger, byTouch) {
         if (movedEl === wrap) return;      // already showing this one
         if (movedEl) closeLightbox();      // always clear out whatever was open first
 
         movedEl        = wrap;
         originalParent = wrap.parentNode;
         originalNext   = wrap.nextSibling;
+        opener         = trigger || null;
+        /* Focus still moves to Close (screen readers, keyboards), but a tap
+           shouldn't paint a focus ring; the first key press brings it back. */
+        overlay.classList.toggle('opened-by-touch', !!byTouch);
+        overlay.setAttribute('aria-label', (wrap.querySelector('.comparison-nav-label') || {}).textContent || 'Blockout vs in-game');
         content.appendChild(wrap);
         overlay.classList.add('open');
         document.body.classList.add('lightbox-lock');
+        closeBtn.focus();
       }
 
       function closeLightbox() {
@@ -718,7 +748,24 @@
         overlay.classList.remove('open');
         document.body.classList.remove('lightbox-lock');
         movedEl = null;
+        if (opener) opener.focus(); // back to the expand button that opened it
+        opener = null;
       }
+
+      /* Keep Tab inside the lightbox while it is open */
+      function focusables() {
+        return Array.from(overlay.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'))
+          .filter(n => !n.disabled && n.getClientRects().length);
+      }
+      overlay.addEventListener('keydown', e => {
+        overlay.classList.remove('opened-by-touch');
+        if (e.key !== 'Tab' || !movedEl) return;
+        const list = focusables();
+        if (!list.length) return;
+        const first = list[0], last = list[list.length - 1];
+        if (e.shiftKey && (document.activeElement === first || !overlay.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
 
       document.querySelectorAll('.comparison-expand').forEach(btn => {
         let touchHandled = false;
@@ -727,7 +774,7 @@
           e.preventDefault();
           e.stopPropagation();
           const wrap = btn.closest('.comparison-wrap');
-          if (wrap) openLightbox(wrap);
+          if (wrap) openLightbox(wrap, btn, e.type === 'touchend');
         }
 
         /* stop the tap from also being read as a drag on the slider underneath */

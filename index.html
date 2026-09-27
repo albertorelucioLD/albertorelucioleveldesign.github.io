@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -30,13 +30,14 @@
   </nav>
 
   <div class="nav-drawer" id="nav-drawer">
-    <a href="#work"    onclick="closeDrawer()">Work</a>
-    <a href="#career"  onclick="closeDrawer()">Career</a>
-    <a href="#about"   onclick="closeDrawer()">About</a>
-    <a href="#contact" onclick="closeDrawer()">Contact</a>
+    <a href="#work">Work</a>
+    <a href="#career">Career</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
   </div>
 
 
+  <main>
   <!-- HERO -->
   <section class="hero" id="hero">
     <div class="hero-bg" style="position:absolute;inset:0;width:100%;height:100%;">
@@ -304,6 +305,8 @@
   </section>
 
 
+  </main>
+
   <!-- FOOTER -->
   <footer class="footer">
     <span class="footer-copy">© 2026 Alberto Relucio</span>
@@ -376,11 +379,14 @@
   <script>
         /* ── DIAMOND ANIMATION — starts fully hidden, draws on load ── */
     (function () {
+      /* Reduced motion: every part appears at once in its final state */
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function show(id, delay, dur) {
         /* Fade in via opacity after making visible */
         var el = document.getElementById(id);
         if (!el) return;
+        if (reduceMotion) { el.setAttribute('visibility', 'visible'); el.style.opacity = '1'; return; }
         setTimeout(function () {
           el.setAttribute('visibility', 'visible');
           el.style.opacity = '0';
@@ -400,7 +406,8 @@
         var perim = id === 'd-outer' ? 1904 : 1440;
         /* Set up dash BEFORE making visible */
         el.setAttribute('stroke-dasharray', perim);
-        el.setAttribute('stroke-dashoffset', perim);
+        el.setAttribute('stroke-dashoffset', reduceMotion ? 0 : perim);
+        if (reduceMotion) { el.setAttribute('visibility', 'visible'); el.style.opacity = '1'; return; }
         setTimeout(function () {
           el.setAttribute('visibility', 'visible');
           el.style.opacity = '1';
@@ -443,16 +450,28 @@
         drawer.classList.remove('open');
         hamburger.setAttribute('aria-expanded', 'false');
       }
-      window.closeDrawer = closeDrawer;
 
+      hamburger.setAttribute('aria-controls', 'nav-drawer');
       hamburger.addEventListener('click', function () {
         var open = drawer.classList.toggle('open');
         hamburger.setAttribute('aria-expanded', open);
+        if (open) drawer.querySelector('a').focus(); // start keyboard users inside the menu
+      });
+
+      drawer.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeDrawer);
       });
 
       document.addEventListener('click', function (e) {
         if (!drawer.contains(e.target) && !hamburger.contains(e.target)) {
           closeDrawer();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) {
+          closeDrawer();
+          hamburger.focus();
         }
       });
     })();
@@ -461,10 +480,20 @@
     (function () {
       var corners = ['hc-tl', 'hc-tr', 'hc-br', 'hc-bl'];
       var isMobile = true; // CSS handles display:none on desktop
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       corners.forEach(function(id, i) {
         var el = document.getElementById(id);
         if (!el) return;
+        if (reduceMotion) {
+          /* Reduced motion: outer and inner brackets appear drawn */
+          [el, document.getElementById(id + '2')].forEach(function (n) {
+            if (!n) return;
+            n.setAttribute('visibility', 'visible');
+            n.style.opacity = '1';
+          });
+          return;
+        }
         var perim = 80;
         el.setAttribute('stroke-dasharray', perim);
         el.setAttribute('stroke-dashoffset', perim);
