@@ -71,10 +71,13 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Fewer, gentler changes rather than none: colour and opacity still ease
+     (150ms) so state changes stay legible; nothing moves or resizes. */
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, opacity, fill, stroke !important;
+    transition-duration: 150ms !important;
   }
   html { scroll-behavior: auto; }
 }
@@ -601,7 +604,10 @@ button {
   border-color: var(--color-accent);
   color: var(--color-accent);
   background: var(--color-accent-dim);
-  transform: translateY(-1px);
+}
+/* The 1px lift only where hover is real: on touch it stuck after a tap. */
+@media (hover: hover) and (pointer: fine) {
+  .link-ghost:hover { transform: translateY(-1px); }
 }
 
 .link-ghost.primary {
@@ -936,7 +942,7 @@ button:focus-visible {
   width: var(--hairline);
   height: 60px;
   background: linear-gradient(to bottom, var(--color-accent), transparent);
-  animation: scrollpulse 2.4s ease-in-out infinite;
+  animation: scrollpulse 2.4s ease-in-out 2.5 forwards; /* 2.5 pulses (~6s), then it rests at full strength */
 }
 
 /* Page header (gothic.html) */
@@ -1086,7 +1092,6 @@ button:focus-visible {
 }
 
 .card-level:last-child { margin-bottom: 0; }
-.card-level:hover      { border-color: var(--color-line-strong); }
 
 /* Top row: image (full width), description below — always stacked.
    (Previously a 2-column grid on wide screens, but that combination
@@ -1478,8 +1483,10 @@ button:focus-visible {
 .reveal {
   opacity: 0;
   transform: translateY(16px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out);
 }
+/* Zone cards are 2000px+ tall: they only fade, they don't rise */
+.card-level.reveal { transform: none; }
 
 .reveal.visible {
   opacity: 1;
@@ -1652,8 +1659,11 @@ button:focus-visible {
 .comparison-label { position: absolute; top: 12px; font-size: var(--text-label); letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--radius-sm); z-index: 10; pointer-events: none; }
 .comparison-label-before { left: 12px; color: var(--color-text-muted); background: var(--color-chip); }
 .comparison-label-after  { right: 12px; color: var(--color-accent-frame); background: var(--color-chip); }
-.comparison-hint { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: var(--text-label); letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); background: var(--color-chip); padding: 4px 10px; border-radius: var(--radius-sm); white-space: nowrap; z-index: 10; pointer-events: none; transition: opacity 0.4s ease; }
+.comparison-hint { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: var(--text-label); letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); background: var(--color-chip); padding: 4px 10px; border-radius: var(--radius-sm); white-space: nowrap; z-index: 10; pointer-events: none; transition: opacity 200ms var(--ease-out); }
 .comparison-hint.hidden { opacity: 0; }
+/* Held: the handle's halo widens (3 → 6px) to acknowledge the grab */
+.comparison-handle { transition: box-shadow 200ms ease; }
+.comparison.is-dragging .comparison-handle { box-shadow: 0 0 0 6px var(--color-accent-ring); transition: box-shadow 120ms var(--ease-out); }
 
 .cpair-caption { padding: 8px 14px; font-size: var(--text-label); letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); border-top: var(--hairline) solid var(--color-line); background: var(--color-bg); min-height: 41px; display: flex; align-items: center; justify-content: center; width: 100%; }
 
@@ -2271,9 +2281,9 @@ body.lightbox-lock .nav { right: var(--lock-sw, 0px); }
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: var(--hairline) solid var(--color-line);
-  transition: transform var(--transition-base);
+  transition: transform 200ms var(--ease-out);
 }
-.chap-bar.is-hidden { transform: translateY(-100%); }
+.chap-bar.is-hidden { transform: translateY(-100%); transition-duration: 240ms; }
 .chap-bar ol {
   list-style: none;
   margin: 0;
@@ -2308,12 +2318,16 @@ body.lightbox-lock .nav { right: var(--lock-sw, 0px); }
 
 /* Jumps from the bar land below the nav and the bar */
 #overview, #trailer, #process, .card-level { scroll-margin-top: calc(var(--nav-height) + 44px + var(--space-4)); }
-/* A zone card that has not revealed yet sits 16px lower (translateY); the jump is
-   computed on that position, so add the offset back and it lands in the same place. */
-.card-level.reveal:not(.visible) { scroll-margin-top: calc(var(--nav-height) + 44px + var(--space-4) + 16px); }
 
 @media (prefers-reduced-motion: reduce) {
-  .chap-bar { transition: none; }
+  /* The chapter bar fades instead of sliding; hidden, clicks pass through
+     but Tab can still reach it (focus brings it back). */
+  .chap-bar { transition: opacity 150ms ease !important; }
+  .chap-bar.is-hidden { transform: none; opacity: 0; pointer-events: none; }
+  /* Blocks appear with a plain fade, no rise */
+  .reveal { transform: translateY(0) !important; transition: opacity 200ms ease !important; } /* translateY(0), not none: same layer, same hairline rendering as before */
+  .hero-scroll-line { animation: none !important; }
+  .comparison.is-dragging .comparison-handle { box-shadow: 0 0 0 3px var(--color-accent-ring); }
   /* No fades at all here, visibility included: the global 0.01ms override would
      leave these hidden for an instant on open, and WebKit then refuses the focus
      that moves into the menu or onto the lightbox's Close button. */

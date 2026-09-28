@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=35">
+  <link rel="stylesheet" href="style.css?v=36">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -785,12 +785,13 @@
         }, () => { sweepDone = true; });
       }, { threshold: 0.6 }).observe(el);
 
-      el.addEventListener('mousedown',  e => { e.preventDefault(); stopSweep(); measure(); dragging = true; hideHint(); });
+      el.addEventListener('mousedown',  e => { e.preventDefault(); stopSweep(); measure(); dragging = true; el.classList.add('is-dragging'); hideHint(); });
       window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup',   () => { dragging = false; });
-      el.addEventListener('touchstart', e => { stopSweep(); measure(); dragging = true; hideHint(); onMove(e); }, { passive: true });
+      window.addEventListener('mouseup',   () => { dragging = false; el.classList.remove('is-dragging'); });
+      el.addEventListener('touchstart', e => { stopSweep(); measure(); dragging = true; el.classList.add('is-dragging'); hideHint(); onMove(e); }, { passive: true });
       el.addEventListener('touchmove',  onMove, { passive: true });
-      el.addEventListener('touchend',   () => { dragging = false; });
+      el.addEventListener('touchend',   () => { dragging = false; el.classList.remove('is-dragging'); });
+      el.addEventListener('touchcancel', () => { dragging = false; el.classList.remove('is-dragging'); });
       wrap.addEventListener('pointerdown', stopSweep); // prev/next, pair names, expand
       wrap.addEventListener('keydown', stopSweep);     // slider keys, or Enter on a control
 
@@ -826,9 +827,7 @@
         const y = window.scrollY;
         const line = navH() + bar.offsetHeight + 24;
         let k = -1;
-        /* ignore the reveal offset (translateY) so a card that is still revealing counts where it will land */
-        const topOf = t => { let dy = 0; try { dy = new DOMMatrixReadOnly(getComputedStyle(t).transform).m42; } catch (e) {} return t.getBoundingClientRect().top - dy; };
-        targets.forEach((t, i) => { if (t && topOf(t) <= line) k = i; });
+        targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top <= line) k = i; });
         if (k !== active) {
           active = k;
           links.forEach((a, i) => { if (i === k) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });

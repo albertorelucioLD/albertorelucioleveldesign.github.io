@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=35">
+  <link rel="stylesheet" href="style.css?v=36">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -565,11 +565,22 @@
       let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(sizeCard, 150); });
     })();
 
-    /* ── SCROLL REVEAL ── (same observer as gothic.html) */
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.08 }
-    );
+    /* ── SCROLL REVEAL ── (same observer as gothic.html)
+       Timeline entries that come into view together appear one after another,
+       60ms apart; with reduced motion they all fade in at once. */
+    const observer = new IntersectionObserver(entries => {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let step = 0;
+      entries.forEach(e => {
+        if (!e.isIntersecting || e.target.classList.contains('visible')) return;
+        if (!reduce && e.target.classList.contains('timeline-item')) {
+          const delay = step++ * 60;
+          e.target.style.transitionDelay = delay + 'ms';
+          setTimeout(() => { e.target.style.transitionDelay = ''; }, delay + 500);
+        }
+        e.target.classList.add('visible');
+      });
+    }, { threshold: 0.08 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     document.documentElement.classList.add('js-reveal'); // observer is live: drop the 2 s CSS fallback
   </script>
