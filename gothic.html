@@ -642,13 +642,25 @@
         return pairs[current].querySelector('.comparison-after');
       }
 
+      /* Divider and handle move with transform (no layout per frame), in pixels
+         of the comparator's width; the CSS left: 50% only covers the no-JS case. */
+      let width = 0, offset = 0; // offset: snap on the screen's pixel grid, not the box's
+      function measure() { const r = el.getBoundingClientRect(); width = r.width; offset = r.left; }
+      measure();
+      divider.style.left = '0';
+      handle.style.left  = '0';
+      new ResizeObserver(() => { measure(); applyPos(pos); }).observe(el);
+
       function applyPos(pct) {
         pos = Math.max(0, Math.min(100, pct));
+        const dpr = window.devicePixelRatio || 1;
+        /* Land on the same device pixel the old left: X% did: round the on-screen
+           position, then subtract the box's own snapped position, so the shift is
+           a whole number of device pixels and the 1px line stays crisp. */
+        const x = Math.round((offset + pos / 100 * width) * dpr) / dpr - Math.round(offset * dpr) / dpr;
         getActiveAfter().style.clipPath = `inset(0 0 0 ${pos}%)`;
-        divider.style.left  = pos + '%';
-        handle.style.left   = pos + '%';
-        handle.style.top    = '50%';
-        handle.style.transform = 'translate(-50%, -50%)';
+        divider.style.transform = `translateX(${x}px)`;
+        handle.style.transform  = `translate(${x}px, 0) translate(-50%, -50%)`;
         handle.setAttribute('aria-valuenow', Math.round(pos));
         handle.setAttribute('aria-valuetext', Math.round(pos) + '%');
       }
@@ -699,12 +711,63 @@
         hintDone = true;
       }
 
-      el.addEventListener('mousedown',  e => { e.preventDefault(); dragging = true; hideHint(); });
+      /* ── ENTRY SWEEP ──
+         The first time a comparator is well into view, the divider eases once
+         from 50% to 30% and back, showing the gesture without words. It runs
+         once per comparator, never after the reader has touched it, never in
+         the lightbox, and not at all with reduced motion. Any touch, click or
+         key on it stops the sweep where it is and hands over control. */
+      const SWEEP_MS = 900;
+      let sweepDone = false, sweepFrame = 0, sweepTimer = 0;
+
+      /* cubic-bezier(0.77, 0, 0.175, 1): strong ease-in-out for on-screen movement */
+      function easeInOut(t) {
+        const x1 = 0.77, y1 = 0, x2 = 0.175, y2 = 1;
+        const bez = (a, b, s) => 3 * a * s * (1 - s) * (1 - s) + 3 * b * s * s * (1 - s) + s * s * s;
+        let lo = 0, hi = 1, s = t;
+        for (let i = 0; i < 20; i++) { s = (lo + hi) / 2; if (bez(x1, x2, s) < t) lo = s; else hi = s; }
+        return bez(y1, y2, s);
+      }
+
+      function stopSweep() {
+        sweepDone = true;
+        clearTimeout(sweepTimer);
+        cancelAnimationFrame(sweepFrame);
+      }
+
+      function runSweep() {
+        let t0 = 0;
+        const step = ts => {
+          if (sweepDone) return;
+          if (!t0) t0 = ts;
+          const t = Math.min(1, (ts - t0) / SWEEP_MS);
+          applyPos(50 - 20 * Math.sin(Math.PI * easeInOut(t)));
+          if (t < 1) sweepFrame = requestAnimationFrame(step);
+          else sweepDone = true;
+        };
+        sweepFrame = requestAnimationFrame(step);
+      }
+
+      new IntersectionObserver((entries, io) => {
+        if (!entries.some(e => e.isIntersecting)) return;
+        io.disconnect();
+        if (sweepDone || hintDone || el.closest('#lightbox-content')) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { sweepDone = true; return; }
+        const imgs = Array.from(pairs[current].querySelectorAll('img'));
+        Promise.all(imgs.map(img => img.decode())).then(() => {
+          if (sweepDone || hintDone || el.closest('#lightbox-content')) return;
+          sweepTimer = setTimeout(runSweep, 400);
+        }, () => { sweepDone = true; });
+      }, { threshold: 0.6 }).observe(el);
+
+      el.addEventListener('mousedown',  e => { e.preventDefault(); stopSweep(); measure(); dragging = true; hideHint(); });
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup',   () => { dragging = false; });
-      el.addEventListener('touchstart', e => { dragging = true; hideHint(); onMove(e); }, { passive: true });
+      el.addEventListener('touchstart', e => { stopSweep(); measure(); dragging = true; hideHint(); onMove(e); }, { passive: true });
       el.addEventListener('touchmove',  onMove, { passive: true });
       el.addEventListener('touchend',   () => { dragging = false; });
+      wrap.addEventListener('pointerdown', stopSweep); // prev/next, pair names, expand
+      wrap.addEventListener('keydown', stopSweep);     // slider keys, or Enter on a control
 
       btnPrev.addEventListener('click', () => showPair(current - 1));
       btnNext.addEventListener('click', () => showPair(current + 1));
