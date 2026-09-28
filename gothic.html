@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=34">
+  <link rel="stylesheet" href="style.css?v=35">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -638,9 +638,9 @@
         io.disconnect();
       }, { rootMargin: '400px 0px' }).observe(el);
 
-      function getActiveAfter() {
-        return pairs[current].querySelector('.comparison-after');
-      }
+      /* Every pair's in-game layer shares the divider position, so the pair fading
+         out and the one fading in always line up with it. */
+      const afters = pairs.map(p => p.querySelector('.comparison-after'));
 
       /* Divider and handle move with transform (no layout per frame), in pixels
          of the comparator's width; the CSS left: 50% only covers the no-JS case. */
@@ -658,7 +658,7 @@
            position, then subtract the box's own snapped position, so the shift is
            a whole number of device pixels and the 1px line stays crisp. */
         const x = Math.round((offset + pos / 100 * width) * dpr) / dpr - Math.round(offset * dpr) / dpr;
-        getActiveAfter().style.clipPath = `inset(0 0 0 ${pos}%)`;
+        afters.forEach(a => { a.style.clipPath = `inset(0 0 0 ${pos}%)`; });
         divider.style.transform = `translateX(${x}px)`;
         handle.style.transform  = `translate(${x}px, 0) translate(-50%, -50%)`;
         handle.setAttribute('aria-valuenow', Math.round(pos));
@@ -682,10 +682,35 @@
         hideHint();
       });
 
+      /* Changing pair: the controls update at once; the new pair fades in over the
+         old one only once its images are decoded, so it never fades through black.
+         Rapid changes keep only the latest request. */
+      let swapToken = 0, leaveTimer = 0, firstShow = true;
       function showPair(n) {
-        pairs[current].classList.remove('active');
+        const from = pairs.find(p => p.classList.contains('active')) || pairs[current]; // the pair on screen
         current = Math.max(0, Math.min(pairs.length - 1, n));
-        pairs[current].classList.add('active');
+        const to = pairs[current];
+        const token = ++swapToken;
+        clearTimeout(leaveTimer);
+        pairs.forEach(p => { if (p !== from && p !== to) p.classList.remove('active', 'leaving', 'entering'); });
+        if (firstShow || from === to) {
+          firstShow = false;
+          from.classList.remove('active', 'leaving', 'entering');
+          to.classList.add('active');
+        } else {
+          warm(current);
+          Promise.all(Array.from(to.querySelectorAll('img')).map(img => img.decode().catch(() => {}))).then(() => {
+            if (token !== swapToken) return;
+            from.classList.remove('active', 'entering');
+            from.classList.add('leaving');
+            to.classList.remove('leaving');
+            to.classList.add('active', 'entering');
+            void to.offsetWidth; // commit the transparent start before fading in
+            to.classList.remove('entering');
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            leaveTimer = setTimeout(() => { if (token === swapToken) from.classList.remove('leaving'); }, reduce ? 0 : 160 + 60);
+          });
+        }
         applyPos(50); // reset to centre on each new pair
         counter.textContent = (current + 1) + ' / ' + pairs.length;
         names.forEach((b, i) => b.setAttribute('aria-current', i === current ? 'true' : 'false'));
@@ -834,38 +859,76 @@
       const closeBtn = document.getElementById('lightbox-close');
       if (!overlay || !content || !closeBtn) return;
 
-      let movedEl = null, originalParent = null, originalNext = null, opener = null;
+      /* Opening and closing run in two steps so the page never shows a gap or a
+         jump: the dark backdrop fades in over the page first; only once it
+         covers the page does the comparator leave it (an identical, inert copy
+         takes its place, so nothing below moves) and fade in on top. Closing
+         fades the comparator out, puts it back in place of the copy while the
+         backdrop still covers the page, and then lifts the backdrop. */
+      let movedEl = null, placeholder = null, opener = null, phase = 'closed', timer = 0;
+      const wait = ms => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
 
       overlay.setAttribute('role', 'dialog');
       overlay.setAttribute('aria-modal', 'true');
 
-      function openLightbox(wrap, trigger, byTouch) {
-        if (movedEl === wrap) return;      // already showing this one
-        if (movedEl) closeLightbox();      // always clear out whatever was open first
+      function finishClose() {
+        clearTimeout(timer);
+        if (placeholder) { placeholder.replaceWith(movedEl); placeholder = null; }
+        overlay.classList.remove('show', 'open');
+        document.body.classList.remove('lightbox-lock');
+        const nav = document.querySelector('.nav');
+        nav.style.paddingLeft = ''; nav.style.paddingRight = '';
+        const back = opener;
+        movedEl = null; opener = null; phase = 'closed';
+        if (back) back.focus({ preventScroll: true }); // back to the expand button that opened it
+      }
 
-        movedEl        = wrap;
-        originalParent = wrap.parentNode;
-        originalNext   = wrap.nextSibling;
-        opener         = trigger || null;
+      function openLightbox(wrap, trigger, byTouch) {
+        if (phase === 'closing') finishClose();   // a close still running: finish it now
+        if (phase !== 'closed') return;           // already opening or open
+
+        movedEl = wrap;
+        opener  = trigger || null;
+        phase   = 'opening';
         /* Focus still moves to Close (screen readers, keyboards), but a tap
            shouldn't paint a focus ring; the first key press brings it back. */
         overlay.classList.toggle('opened-by-touch', !!byTouch);
         overlay.setAttribute('aria-label', (wrap.querySelector('.comparison-nav-label') || {}).textContent || 'Blockout vs in-game');
-        content.appendChild(wrap);
         overlay.classList.add('open');
+        /* Removing the scrollbar must not move the page behind: keep its width as
+           padding, and freeze the fixed nav's padding (a % of the viewport). */
+        const nav = document.querySelector('.nav'), ns = getComputedStyle(nav);
+        nav.style.paddingLeft = ns.paddingLeft; nav.style.paddingRight = ns.paddingRight;
+        document.body.style.setProperty('--lock-sw', (window.innerWidth - document.documentElement.clientWidth) + 'px');
         document.body.classList.add('lightbox-lock');
         closeBtn.focus();
+
+        const copy = wrap.cloneNode(true);
+        copy.setAttribute('inert', '');
+        copy.setAttribute('aria-hidden', 'true');
+        const decoded = Promise.all(Array.from(copy.querySelectorAll('.cpair.active img')).map(img => img.decode().catch(() => {})));
+        const covered = new Promise(r => { timer = setTimeout(r, wait(220)); });
+        Promise.all([decoded, covered]).then(() => {
+          if (phase !== 'opening' || movedEl !== wrap) return;
+          wrap.before(copy);          // same size and pixels: the page behind does not change
+          placeholder = copy;
+          content.appendChild(wrap);
+          overlay.classList.add('show');
+          phase = 'open';
+        });
       }
 
       function closeLightbox() {
-        if (!movedEl) return;
-        if (originalNext) originalParent.insertBefore(movedEl, originalNext);
-        else originalParent.appendChild(movedEl);
-        overlay.classList.remove('open');
-        document.body.classList.remove('lightbox-lock');
-        movedEl = null;
-        if (opener) opener.focus(); // back to the expand button that opened it
-        opener = null;
+        if (phase === 'closed' || phase === 'closing') return;
+        const wasOpen = phase === 'open';
+        phase = 'closing';
+        clearTimeout(timer);
+        overlay.classList.remove('show');              // comparator fades out, backdrop stays
+        timer = setTimeout(() => {
+          if (placeholder) { placeholder.replaceWith(movedEl); placeholder = null; }
+          overlay.classList.remove('open');            // then the backdrop lifts
+          timer = setTimeout(finishClose, wait(150));
+        }, wasOpen ? wait(150) : 0);
       }
 
       /* Keep Tab inside the lightbox while it is open */
@@ -875,7 +938,7 @@
       }
       overlay.addEventListener('keydown', e => {
         overlay.classList.remove('opened-by-touch');
-        if (e.key !== 'Tab' || !movedEl) return;
+        if (e.key !== 'Tab' || phase === 'closed') return;
         const list = focusables();
         if (!list.length) return;
         const first = list[0], last = list[list.length - 1];

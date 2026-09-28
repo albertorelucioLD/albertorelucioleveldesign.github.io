@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=34">
+  <link rel="stylesheet" href="style.css?v=35">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -469,11 +469,15 @@
         link.addEventListener('click', closeDrawer);
       });
 
-      document.addEventListener('click', function (e) {
-        if (!drawer.contains(e.target) && !hamburger.contains(e.target)) {
+      /* Tap or click outside closes it. iOS sends no click for taps on
+         non-interactive areas, so touchstart covers those. */
+      function closeIfOutside(e) {
+        if (drawer.classList.contains('open') && !drawer.contains(e.target) && !hamburger.contains(e.target)) {
           closeDrawer();
         }
-      });
+      }
+      document.addEventListener('click', closeIfOutside);
+      document.addEventListener('touchstart', closeIfOutside, { passive: true });
 
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && drawer.classList.contains('open')) {

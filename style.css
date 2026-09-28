@@ -183,6 +183,9 @@ button {
   --transition-fast: 0.15s ease;
   --transition-base: 0.20s ease;
   --transition-slow: 0.35s ease;
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);    /* strong ease-out: entrances, exits, UI responses */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* strong ease-in-out: movement on screen */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);    /* iOS-like drawer curve */
 
   /* Border radius */
   --radius-sm: 2px;
@@ -485,18 +488,27 @@ button {
 
 .nav-hamburger:hover span { background: var(--color-accent); }
 
+/* The drawer fades in and out. Its own opacity never changes: Safari stops
+   drawing backdrop-filter while an element is partly transparent, so the
+   panel fades its fill, hairline and blur instead, and the links fade on
+   their own. Closed, it is hidden (visibility) so nothing in it is focusable. */
 .nav-drawer {
-  display: none;
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
   position: fixed;
   top: var(--nav-height);
   left: 0; right: 0;
-  background: var(--color-nav-bg);
-  backdrop-filter: blur(10px);
-  border-bottom: var(--hairline) solid var(--color-line);
+  background: transparent;
+  backdrop-filter: blur(0);
+  border-bottom: var(--hairline) solid transparent;
   padding: var(--space-6) var(--section-x);
   flex-direction: column;
   gap: var(--space-5);
   z-index: 199;
+  --drawer-t: 150ms;
+  transition: background-color var(--drawer-t) var(--ease-out), border-color var(--drawer-t) var(--ease-out),
+              backdrop-filter var(--drawer-t) var(--ease-out), visibility 0s linear var(--drawer-t);
 }
 
 .nav-drawer a {
@@ -505,11 +517,22 @@ button {
   text-transform: uppercase;
   color: var(--color-text-muted);
   text-decoration: none;
-  transition: color var(--transition-base);
+  opacity: 0;
+  transition: color var(--transition-base), opacity var(--drawer-t) var(--ease-out);
 }
 
 .nav-drawer a:hover { color: var(--color-accent); }
-.nav-drawer.open    { display: flex; }
+.nav-drawer.open {
+  visibility: visible;
+  pointer-events: auto;
+  background: var(--color-nav-bg);
+  backdrop-filter: blur(10px);
+  border-bottom-color: var(--color-line);
+  --drawer-t: 200ms;
+  transition: background-color var(--drawer-t) var(--ease-drawer), border-color var(--drawer-t) var(--ease-drawer),
+              backdrop-filter var(--drawer-t) var(--ease-drawer), visibility 0s;
+}
+.nav-drawer.open a { opacity: 1; transition: color var(--transition-base), opacity var(--drawer-t) var(--ease-drawer); }
 
 
 /* ============================================================
@@ -1615,8 +1638,11 @@ button:focus-visible {
   overflow: hidden; background: var(--color-media-well-deep); cursor: ew-resize;
   user-select: none; touch-action: pan-y;
 }
-.cpair { position: absolute; inset: 0; display: none; }
-.cpair.active { display: block; }
+.cpair { position: absolute; inset: 0; display: none; transition: opacity 160ms ease; }
+.cpair.active { display: block; z-index: 1; }
+/* changing pair: the new one (already decoded) fades in over the old one */
+.cpair.leaving { display: block; z-index: 0; }
+.cpair.entering { opacity: 0; }
 .comparison-before, .comparison-after { position: absolute; inset: 0; width: 100%; height: 100%; }
 .comparison-before img, .comparison-after img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -1645,17 +1671,33 @@ button:focus-visible {
 .lightbox-content .comparison-expand { display: none; } /* already expanded */
 
 /* ── COMPARISON LIGHTBOX ── */
-body.lightbox-lock { overflow: hidden; }
+/* Locking scroll removes a classic scrollbar; its width (measured by the script)
+   comes back as padding, and the fixed nav keeps its old right edge, so the page
+   behind the lightbox never shifts. Overlay scrollbars measure 0: no change. */
+body.lightbox-lock { overflow: hidden; padding-right: var(--lock-sw, 0px); }
+body.lightbox-lock .nav { right: var(--lock-sw, 0px); }
 
 .lightbox-overlay {
   position: fixed; inset: 0; z-index: 999;
   background: var(--color-lightbox-bg);
-  display: none; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   padding: 56px 20px 20px;
+  /* fades in and out; closed, it is hidden (visibility) so nothing in it takes focus or clicks */
+  visibility: hidden; pointer-events: none; opacity: 0;
+  --lightbox-t: 150ms;
+  transition: opacity var(--lightbox-t) var(--ease-out), visibility 0s linear var(--lightbox-t);
 }
-.lightbox-overlay.open { display: flex; }
+.lightbox-overlay.open {
+  visibility: visible; pointer-events: auto; opacity: 1;
+  --lightbox-t: 220ms;
+  transition: opacity var(--lightbox-t) var(--ease-out), visibility 0s;
+}
 
 .lightbox-content { width: 100%; max-width: max(1100px, calc(78vh * 16 / 9)); }
+/* Two steps: the dark backdrop covers the page first, then the comparator
+   (moved in under that cover) fades in; closing runs the same steps backwards. */
+.lightbox-overlay .lightbox-content { opacity: 0; transition: opacity 150ms var(--ease-out); }
+.lightbox-overlay.show .lightbox-content { opacity: 1; }
 .lightbox-content .comparison-wrap { border-top: none; }
 .lightbox-content .comparison-wrap .comparison { max-height: 78vh; }
 
@@ -2272,6 +2314,10 @@ body.lightbox-lock { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .chap-bar { transition: none; }
+  /* No fades at all here, visibility included: the global 0.01ms override would
+     leave these hidden for an instant on open, and WebKit then refuses the focus
+     that moves into the menu or onto the lightbox's Close button. */
+  .nav-drawer, .nav-drawer a, .lightbox-overlay, .lightbox-content, .cpair { transition: none !important; }
 }
 
 /* ── PAIR NAMES (N1-9): the caption bar lists every pair ── */
