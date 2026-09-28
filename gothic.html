@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36">
+  <link rel="stylesheet" href="style.css?v=37">
 <!-- GoatCounter Analytics -->
 <script data-goatcounter="https://kolding45.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!-- End GoatCounter Analytics -->
@@ -191,7 +191,7 @@
        HOW TO ADD MORE ZONES:
        Duplicate the entire <!-- ZONE 0X --> <!-- comment block.
   ══════════════════════════════════════════════════════════════ --> 
-  <div class="section section--raised section--bordered">
+  <div class="section section--raised section--bordered section--pause">
     <h2 class="eyebrow">Level breakdown</h2>
     <p class="t-body mb-10 breakdown-intro">A selection of zones from across the Valley of Mines, chosen to show range across typologies — open world, interior, hub and dungeon. I worked on over 18 zones throughout the project; these highlight key design decisions and the blockout-to-final pipeline.</p>
 
@@ -996,9 +996,10 @@
         if (!wide.matches || !tops.length) return;
 
         const card = tops[0].getBoundingClientRect().width;
-        let width = card - 420;
+        const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16; // text column 420–720px, growing with the type past 1600px
+        let width = card - 420 * rem;
         tops.forEach(t => { t.style.alignItems = 'flex-start'; });   // measure natural text heights
-        for (let w = Math.ceil(card - 720); w <= card - 420; w += 2) {
+        for (let w = Math.ceil(card - 720 * rem); w <= card - 420 * rem; w += 2) {
           tops.forEach(t => t.style.setProperty('--header-img-w', w + 'px'));
           if (bodies.every(b => b.offsetHeight <= w * 9 / 16)) { width = w; break; }
         }

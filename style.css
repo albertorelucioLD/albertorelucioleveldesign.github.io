@@ -36,6 +36,12 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
 }
+/* Above 1600px the root size grows with the window, 16 → 18px at 2560: every
+   rem-based size (all type) grows by up to 12.5%, hierarchy intact. Below
+   1600px nothing changes. Zone cards and the comparator cap scale with it. */
+@media (min-width: 1601px) {
+  html { font-size: clamp(16px, calc(16px + (100vw - 1600px) / 480), 18px); }
+}
 
 body {
   background-color: var(--color-bg);
@@ -178,7 +184,7 @@ button {
   --page-max:     1440px;   /* shared content column on wide screens */
   --gutter:       max(var(--section-x), calc((100% - var(--page-max)) / 2)); /* side padding that centres that column */
   --measure:      60ch;     /* line length for 13px running text (≈ 55–75 characters in Inter) */
-  --compare-max:  max(1100px, min(1600px, calc(78vh * 16 / 9))); /* comparator: grows with the screen, never taller than the lightbox view */
+  --compare-max:  max(1100px, min(100rem, calc(78vh * 16 / 9))); /* comparator: grows with the screen, never taller than the lightbox view; 100rem = 1600px, up to 1800px as type grows past 1600px */
   --measure-note: 60ch;     /* line length for 12px notes (≈ 55–65 characters) */
   --nav-height:   52px;
 
@@ -726,6 +732,12 @@ button:focus-visible {
 .section {
   padding: var(--section-y) var(--gutter);
 }
+/* Section rhythm opens up past 1440px (80 → 128px at 2560); the two main
+   chapters (Selected work, Level breakdown) get a longer pause before them. */
+@media (min-width: 1441px) {
+  :root { --section-y: clamp(80px, calc(80px + (100vw - 1440px) * 0.042857), 128px); }
+}
+.section--pause { padding-top: calc(var(--section-y) * 1.5); }
 
 .section--raised    { background: var(--color-bg-raised); }
 .section--bordered  { border-top: var(--hairline) solid var(--color-line); }
@@ -2178,8 +2190,8 @@ body.lightbox-lock .nav { right: var(--lock-sw, 0px); }
   }
   .card-level-body {
     flex: 1 1 0;
-    min-width: 420px;
-    max-width: 720px;
+    min-width: 26.25rem; /* 420px, grows with the type */
+    max-width: 45rem;    /* 720px */
   }
   .card-featured { grid-template-columns: var(--header-img-w, minmax(0, 1fr)) minmax(0, 1fr); }
   .card-image { aspect-ratio: 16 / 9; align-self: start; }
@@ -2207,10 +2219,14 @@ body.lightbox-lock .nav { right: var(--lock-sw, 0px); }
 }
 
 /* ── LEVEL BREAKDOWN: evidence first ──
-   Desktop: zone cards step 80px past the shared column when the window has
-   room, so the comparator can reach --compare-max (1600px). */
+   Desktop: zone cards step past the shared column when the window has room
+   (80px a side, more as the type grows), so the comparator can reach
+   --compare-max (1600px, up to 1800px). */
 @media (min-width: 1700px) and (hover: hover) and (pointer: fine) {
-  .card-level { margin-left: -80px; margin-right: -80px; }
+  /* 100rem wide (1600px, up to 1800px as type grows), centred on the column */
+  .card-level { margin-left: calc((var(--page-max) - 100rem) / 2); margin-right: calc((var(--page-max) - 100rem) / 2); }
+  /* The home card widens in step with the type (0 → 100px a side) so its text still fits beside the image */
+  .card-featured { margin-left: calc((1600px - 100rem) / 2); margin-right: calc((1600px - 100rem) / 2); }
 }
 
 /* Stacked cards (tablet, touch, narrow windows): the comparator follows the
