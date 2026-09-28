@@ -1715,13 +1715,19 @@ body.lightbox-lock .nav { right: var(--lock-sw, 0px); }
   transition: opacity var(--lightbox-t) var(--ease-out), visibility 0s;
 }
 
-.lightbox-content { width: 100%; max-width: max(1100px, calc(78vh * 16 / 9)); }
+/* The comparator stays 16:9 and uncropped: the content is never wider than the
+   height left for the image allows (overlay padding 76px + nav and caption bars,
+   measured by the script as --lb-bars) times 16/9. */
+.lightbox-content {
+  width: 100%;
+  max-width: min(max(1100px, calc(78vh * 16 / 9)), calc((100vh - 76px - var(--lb-bars, 92px)) * 16 / 9));
+  max-width: min(max(1100px, calc(78vh * 16 / 9)), calc((100dvh - 76px - var(--lb-bars, 92px)) * 16 / 9));
+}
 /* Two steps: the dark backdrop covers the page first, then the comparator
    (moved in under that cover) fades in; closing runs the same steps backwards. */
 .lightbox-overlay .lightbox-content { opacity: 0; transition: opacity 150ms var(--ease-out); }
 .lightbox-overlay.show .lightbox-content { opacity: 1; }
 .lightbox-content .comparison-wrap { border-top: none; }
-.lightbox-content .comparison-wrap .comparison { max-height: 78vh; }
 
 .lightbox-close {
   position: fixed; top: 16px; right: 16px; z-index: 1000;
