@@ -1663,7 +1663,7 @@ button:focus-visible {
 .cpair.leaving { display: block; z-index: 0; }
 .cpair.entering { opacity: 0; }
 .comparison-before, .comparison-after { position: absolute; inset: 0; width: 100%; height: 100%; }
-.comparison-before img, .comparison-after img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.comparison-before img, .comparison-after img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; } /* contain: evidence is never cropped, even if the frame rounds off 16:9 */
 
 .comparison-after { clip-path: inset(0 0 0 50%); } /* in-game shows right of the divider, blockout left */
 .comparison-divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--color-accent); z-index: 10; pointer-events: none; }
